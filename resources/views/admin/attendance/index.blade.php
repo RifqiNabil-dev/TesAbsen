@@ -58,6 +58,7 @@
                     <th class="px-4 py-3">Check In</th>
                     <th class="px-4 py-3">Check Out</th>
                     <th class="px-4 py-3">Status</th>
+                    <th class="p-3 text-left">Status Lokasi</th>
                     <th class="px-4 py-3 text-center">Aksi</th>
                 </tr>
             </thead>
@@ -94,6 +95,22 @@
                             <span class="rounded bg-yellow-100 px-2 py-1 text-xs font-semibold text-yellow-700">Terlambat</span>
                         @else
                             <span class="rounded bg-red-100 px-2 py-1 text-xs font-semibold text-red-700">Tidak Hadir</span>
+                        @endif
+                    </td>
+                    <!-- STATUS LOKASI -->
+                    <td class="p-3">
+                         @if($attendance->location_status === 'berada dilokasi magang')
+                                <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-medium">
+                                        Berada di Lokasi
+                                </span>
+                        @elseif($attendance->location_status === 'diluar lokasi magang')
+                                <span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-medium">
+                                        Diluar Lokasi
+                                </span>
+                        @else
+                                <span class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs font-medium">
+                                        -
+                                </span>
                         @endif
                     </td>
                     <td class="px-4 py-3 text-center">

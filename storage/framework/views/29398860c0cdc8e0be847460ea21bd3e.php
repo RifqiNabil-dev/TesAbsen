@@ -26,6 +26,7 @@
                         <th class="p-3 text-left">Check Out</th>
                         <th class="p-3 text-left">Durasi</th>
                         <th class="p-3 text-left">Status</th>
+                        <th class="p-3 text-left">Status Lokasi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y">
@@ -51,6 +52,8 @@
                                 <?php echo e($attendance->work_duration ? $attendance->work_duration . ' jam' : '-'); ?>
 
                             </td>
+
+                            <!-- STATUS KEHADIRAN -->
                             <td class="p-3">
                                 <?php if($attendance->status === 'hadir'): ?>
                                     <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-medium">
@@ -66,10 +69,27 @@
                                     </span>
                                 <?php endif; ?>
                             </td>
+
+                            <!-- STATUS LOKASI -->
+                            <td class="p-3">
+                                <?php if($attendance->location_status === 'berada dilokasi magang'): ?>
+                                    <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-medium">
+                                        Berada di Lokasi
+                                    </span>
+                                <?php elseif($attendance->location_status === 'diluar lokasi magang'): ?>
+                                    <span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-medium">
+                                        Diluar Lokasi
+                                    </span>
+                                <?php else: ?>
+                                    <span class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs font-medium">
+                                        -
+                                    </span>
+                                <?php endif; ?>
+                            </td>
                         </tr>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                         <tr>
-                            <td colspan="6" class="p-6 text-center text-gray-500">
+                            <td colspan="7" class="p-6 text-center text-gray-500">
                                 Belum ada data presensi
                             </td>
                         </tr>

@@ -109,9 +109,6 @@
                            focus:ring focus:ring-blue-200 focus:border-blue-500"
                 >
                 
-                <p class="text-xs text-gray-500 mt-1">
-                    Contoh: 50 = 50 meter dari titik lokasi magang
-                </p>
             </div>
 
             <!-- STATUS -->

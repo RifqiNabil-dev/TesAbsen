@@ -58,6 +58,7 @@
                     <th class="px-4 py-3">Check In</th>
                     <th class="px-4 py-3">Check Out</th>
                     <th class="px-4 py-3">Status</th>
+                    <th class="p-3 text-left">Status Lokasi</th>
                     <th class="px-4 py-3 text-center">Aksi</th>
                 </tr>
             </thead>
@@ -101,6 +102,22 @@
                             <span class="rounded bg-red-100 px-2 py-1 text-xs font-semibold text-red-700">Tidak Hadir</span>
                         <?php endif; ?>
                     </td>
+                            <!-- STATUS LOKASI -->
+                            <td class="p-3">
+                                <?php if($attendance->location_status === 'berada dilokasi magang'): ?>
+                                    <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-medium">
+                                        Berada di Lokasi
+                                    </span>
+                                <?php elseif($attendance->location_status === 'diluar lokasi magang'): ?>
+                                    <span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-medium">
+                                        Diluar Lokasi
+                                    </span>
+                                <?php else: ?>
+                                    <span class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs font-medium">
+                                        -
+                                    </span>
+                                <?php endif; ?>
+                            </td>
                     <td class="px-4 py-3 text-center">
                         <a href="<?php echo e(route('admin.attendance.show', $attendance)); ?>"
                            class="inline-block rounded bg-blue-500 px-2 py-1 text-white hover:bg-blue-600">
