@@ -3,165 +3,274 @@
 @section('title', 'Dashboard')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="bi bi-speedometer2"></i> Dashboard</h2>
+
+<!-- Header -->
+<div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
+    <h2 class="text-xl sm:text-2xl font-semibold flex items-center gap-2">
+        <i class="bi bi-speedometer2"></i> Dashboard
+    </h2>
 </div>
 
-<div class="row mb-4">
-    <div class="col-md-4">
-        <div class="card text-white bg-primary">
-            <div class="card-body">
-                <h5 class="card-title">Total Presensi</h5>
-                <h2 class="mb-0">{{ $totalAttendance }}</h2>
-            </div>
+<!-- Statistik -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+    <div class="bg-blue-500 text-white rounded-lg shadow">
+        <div class="p-4 sm:p-5">
+            <h5 class="text-xs sm:text-sm font-semibold tracking-wide">Total Presensi</h5>
+            <h2 class="text-2xl sm:text-3xl font-bold">{{ $totalAttendance }}</h2>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card text-white bg-success">
-            <div class="card-body">
-                <h5 class="card-title">Logbook Disetujui</h5>
-                <h2 class="mb-0">{{ $totalLogbooks }}</h2>
-            </div>
+
+    <div class="bg-green-500 text-white rounded-lg shadow">
+        <div class="p-4 sm:p-5">
+            <h5 class="text-xs sm:text-sm font-semibold tracking-wide">Logbook Disetujui</h5>
+            <h2 class="text-2xl sm:text-3xl font-bold">{{ $totalLogbooks }}</h2>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card text-white bg-info">
-            <div class="card-body">
-                <h5 class="card-title">Jadwal Hari Ini</h5>
-                <h4 class="mb-0">{{ $todaySchedule ? $todaySchedule->location->name : '-' }}</h4>
-            </div>
+
+    <div class="bg-cyan-500 text-white rounded-lg shadow">
+        <div class="p-4 sm:p-5">
+            <h5 class="text-xs sm:text-sm font-semibold tracking-wide">Jadwal Hari Ini</h5>
+            <h4 class="text-lg sm:text-xl font-semibold">
+                {{ $todaySchedule ? $todaySchedule->location->name : '-' }}
+            </h4>
         </div>
     </div>
 </div>
 
 @if($todaySchedule)
-<div class="card mb-4">
-    <div class="card-header bg-primary text-white">
-        <h5 class="mb-0"><i class="bi bi-calendar-event"></i> Jadwal Hari Ini</h5>
+<!-- Jadwal Hari Ini -->
+<div class="bg-white rounded-lg shadow mb-6">
+    <div class="bg-blue-600 text-white px-4 sm:px-5 py-3 rounded-t-lg">
+        <h5 class="font-semibold flex items-center gap-2">
+            <i class="bi bi-calendar-event"></i> Jadwal Hari Ini
+        </h5>
     </div>
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-6">
-                <p><strong>Lokasi:</strong> {{ $todaySchedule->location->name }}</p>
-                <p><strong>Waktu:</strong> 
+
+    <div class="p-4 sm:p-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <p class="mb-1"><strong>Lokasi:</strong> {{ $todaySchedule->location->name }}</p>
+                <p>
+                    <strong>Waktu:</strong>
                     @php
-                        $startTime = is_string($todaySchedule->start_time) ? \Carbon\Carbon::parse($todaySchedule->start_time)->format('H:i') : ($todaySchedule->start_time instanceof \Carbon\Carbon ? $todaySchedule->start_time->format('H:i') : $todaySchedule->start_time);
-                        $endTime = is_string($todaySchedule->end_time) ? \Carbon\Carbon::parse($todaySchedule->end_time)->format('H:i') : ($todaySchedule->end_time instanceof \Carbon\Carbon ? $todaySchedule->end_time->format('H:i') : $todaySchedule->end_time);
+                        $startTime = \Carbon\Carbon::parse($todaySchedule->start_time)->format('H:i');
+                        $endTime   = \Carbon\Carbon::parse($todaySchedule->end_time)->format('H:i');
                     @endphp
                     {{ $startTime }} - {{ $endTime }}
                 </p>
             </div>
-            <div class="col-md-6">
-                @if($todayAttendance)
-                    @if($todayAttendance->check_in && !$todayAttendance->check_out)
-                        <form method="POST" action="{{ route('mahasiswa.attendance.checkout') }}" class="d-inline">
+
+            <div class="flex items-center">
+                {{-- ================= FIX LOGIKA ABSENSI ================= --}}
+                @if($todayAttendance && $todayAttendance->check_in)
+
+                    @if(!$todayAttendance->check_out)
+                        <form method="POST" action="{{ route('mahasiswa.attendance.checkout') }}">
                             @csrf
-                            <button type="submit" class="btn btn-danger btn-lg">
-                                <i class="bi bi-box-arrow-right"></i> Check Out
+                            <button type="submit"
+                                class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg
+                                       text-base sm:text-lg flex items-center gap-2">
+                                <i class="bi bi-box-arrow-right"></i> Absen Pulang
                             </button>
                         </form>
-                    @elseif($todayAttendance->check_in && $todayAttendance->check_out)
-                        <p class="text-success"><i class="bi bi-check-circle"></i> Sudah check-in dan check-out hari ini</p>
+                    @else
+                        <p class="text-green-600 font-semibold flex items-center gap-2">
+                            <i class="bi bi-check-circle"></i>
+                            Sudah absen masuk dan pulang hari ini
+                        </p>
                     @endif
+
                 @else
-                    <form method="POST" action="{{ route('mahasiswa.attendance.checkin') }}" class="d-inline">
-                        @csrf
-                        <button type="submit" class="btn btn-success btn-lg">
-                            <i class="bi bi-box-arrow-in-right"></i> Check In
-                        </button>
-                    </form>
+                    {{-- 🔥 ABSEN MASUK PASTI MUNCUL --}}
+                    <button
+                        type="button"
+                        onclick="openAttendancePreview()"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg
+                               text-base sm:text-lg flex items-center gap-2"
+                    >
+                        <i class="bi bi-box-arrow-in-right"></i> Absen Masuk
+                    </button>
                 @endif
+                {{-- ====================================================== --}}
             </div>
         </div>
     </div>
 </div>
 @endif
 
-<div class="row">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Presensi Terakhir</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-sm">
-                        <thead>
-                            <tr>
-                                <th>Tanggal</th>
-                                <th>Lokasi</th>
-                                <th>Check In</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($recentAttendances as $attendance)
-                                <tr>
-                                    <td>{{ $attendance->date->format('d/m/Y') }}</td>
-                                    <td>{{ $attendance->location->name ?? '-' }}</td>
-                                    <td>{{ $attendance->check_in ? $attendance->check_in->format('H:i') : '-' }}</td>
-                                    <td>
-                                        @if($attendance->status === 'hadir')
-                                            <span class="badge bg-success">Hadir</span>
-                                        @elseif($attendance->status === 'terlambat')
-                                            <span class="badge bg-warning">Terlambat</span>
-                                        @else
-                                            <span class="badge bg-danger">Tidak Hadir</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" class="text-center">Belum ada presensi</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+<!-- Tabel -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    <!-- Presensi -->
+    <div class="bg-white rounded-lg border shadow">
+        <div class="px-4 sm:px-5 py-3 border-b">
+            <h5 class="font-semibold">Presensi Terakhir</h5>
+        </div>
+        <div class="p-4 sm:p-5 overflow-x-auto">
+            <table class="min-w-full text-sm">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="p-2 text-left">Tanggal</th>
+                        <th class="p-2 text-left">Lokasi</th>
+                        <th class="p-2 text-left">Check In</th>
+                        <th class="p-2 text-left">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($recentAttendances as $attendance)
+                        <tr class="border-b">
+                            <td class="p-2">{{ $attendance->date?->format('d/m/Y') ?? '-' }}</td>
+                            <td class="p-2">{{ $attendance->location->name ?? '-' }}</td>
+                            <td class="p-2">{{ $attendance->check_in?->format('H:i') ?? '-' }}</td>
+                            <td class="p-2">
+                                @if($attendance->status === 'hadir')
+                                    <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">Hadir</span>
+                                @elseif($attendance->status === 'terlambat')
+                                    <span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs">Terlambat</span>
+                                @else
+                                    <span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs">Tidak Hadir</span>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="text-center p-4 text-gray-500">
+                                Belum ada presensi
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Logbook Terakhir</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-sm">
-                        <thead>
-                            <tr>
-                                <th>Tanggal</th>
-                                <th>Aktivitas</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($recentLogbooks as $logbook)
-                                <tr>
-                                    <td>{{ $logbook->date->format('d/m/Y') }}</td>
-                                    <td>{{ Str::limit($logbook->activity, 30) }}</td>
-                                    <td>
-                                        @if($logbook->status === 'pending')
-                                            <span class="badge bg-warning">Pending</span>
-                                        @elseif($logbook->status === 'approved')
-                                            <span class="badge bg-success">Disetujui</span>
-                                        @else
-                                            <span class="badge bg-danger">Ditolak</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="3" class="text-center">Belum ada logbook</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+
+    <!-- Logbook -->
+    <div class="bg-white rounded-lg border shadow">
+        <div class="px-4 sm:px-5 py-3 border-b">
+            <h5 class="font-semibold">Logbook Terakhir</h5>
+        </div>
+        <div class="p-4 sm:p-5 overflow-x-auto">
+            <table class="min-w-full text-sm">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="p-2 text-left">Tanggal</th>
+                        <th class="p-2 text-left">Aktivitas</th>
+                        <th class="p-2 text-left">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($recentLogbooks as $logbook)
+                        <tr class="border-b">
+                            <td class="p-2">{{ $logbook->date->format('d/m/Y') }}</td>
+                            <td class="p-2">{{ Str::limit($logbook->activity, 30) }}</td>
+                            <td class="p-2">
+                                @if($logbook->status === 'pending')
+                                    <span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs">Pending</span>
+                                @elseif($logbook->status === 'approved')
+                                    <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs">Disetujui</span>
+                                @else
+                                    <span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs">Ditolak</span>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="3" class="text-center p-4 text-gray-500">
+                                Belum ada logbook
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+{{-- Dummy function biar tidak error --}}
+<script>
+let map, marker;
+
+function openAttendancePreview() {
+    document.getElementById('attendanceModal').classList.remove('hidden');
+    document.getElementById('attendanceModal').classList.add('flex');
+
+    if (!navigator.geolocation) {
+        alert('Browser tidak mendukung GPS');
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(position => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+
+        document.getElementById('latitude').value = lat;
+        document.getElementById('longitude').value = lng;
+
+        setTimeout(() => {
+            if (!map) {
+                map = L.map('mapPreview').setView([lat, lng], 17);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap'
+                }).addTo(map);
+
+                marker = L.marker([lat, lng]).addTo(map)
+                    .bindPopup('Lokasi kamu saat ini')
+                    .openPopup();
+            } else {
+                map.setView([lat, lng], 17);
+                marker.setLatLng([lat, lng]);
+            }
+        }, 300);
+    }, () => {
+        alert('Gagal mengambil lokasi');
+    });
+}
+
+function closeAttendancePreview() {
+    document.getElementById('attendanceModal').classList.add('hidden');
+}
+</script>
+
+
+<!-- MODAL PREVIEW ABSENSI -->
+<div id="attendanceModal"
+     class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+
+    <div class="bg-white rounded-lg w-full max-w-xl mx-4">
+        <div class="px-4 py-3 border-b flex justify-between items-center">
+            <h3 class="font-semibold text-lg">Preview Lokasi Absensi</h3>
+            <button onclick="closeAttendancePreview()" class="text-gray-500">&times;</button>
+        </div>
+
+        <div class="p-4 space-y-3">
+            <div id="mapPreview" class="w-full h-64 rounded"></div>
+
+            <p class="text-sm text-gray-600">
+                Pastikan lokasi kamu sudah benar sebelum konfirmasi absensi.
+            </p>
+
+            <form method="POST" action="{{ route('mahasiswa.attendance.checkin') }}">
+                @csrf
+                <input type="hidden" name="latitude" id="latitude">
+                <input type="hidden" name="longitude" id="longitude">
+
+                <div class="flex justify-end gap-2">
+                    <button type="button"
+                        onclick="closeAttendancePreview()"
+                        class="px-4 py-2 rounded bg-gray-300">
+                        Batal
+                    </button>
+
+                    <button type="submit"
+                        class="px-4 py-2 rounded bg-blue-600 text-white">
+                        Konfirmasi Absen
+                    </button>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 </div>
-@endsection
 
+@endsection

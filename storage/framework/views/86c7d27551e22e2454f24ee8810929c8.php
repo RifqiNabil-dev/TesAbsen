@@ -98,9 +98,9 @@
                         <tbody>
                             <?php $__empty_1 = true; $__currentLoopData = $recentAttendances; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attendance): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                 <tr>
-                                    <td><?php echo e($attendance->date->format('d/m/Y')); ?></td>
+                                    <td><?php echo e($attendance->date?->format('d/m/Y') ?? '-'); ?></td>
                                     <td><?php echo e($attendance->location->name ?? '-'); ?></td>
-                                    <td><?php echo e($attendance->check_in ? $attendance->check_in->format('H:i') : '-'); ?></td>
+                                    <td><?php echo e($attendance->check_in?->format('H:i') ?? '-'); ?></td>
                                     <td>
                                         <?php if($attendance->status === 'hadir'): ?>
                                             <span class="badge bg-success">Hadir</span>

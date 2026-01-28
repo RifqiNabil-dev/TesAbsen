@@ -18,16 +18,30 @@ class Attendance extends Model
         'check_out',
         'status',
         'notes',
+        'location_status',
+        'distance',
+        'latitude',
+        'longitude',
     ];
 
-    protected function casts(): array
+    /*ACCESSORS*/
+
+    public function getDateAttribute($value)
     {
-        return [
-            'date' => 'date',
-            'check_in' => 'datetime',
-            'check_out' => 'datetime',
-        ];
+        return $value ? Carbon::parse($value) : null;
     }
+
+    public function getCheckInAttribute($value)
+    {
+        return $value ? Carbon::parse($value) : null;
+    }
+
+    public function getCheckOutAttribute($value)
+    {
+        return $value ? Carbon::parse($value) : null;
+    }
+
+    /*RELATIONS*/
 
     public function user()
     {
@@ -39,14 +53,13 @@ class Attendance extends Model
         return $this->belongsTo(Location::class);
     }
 
+
     public function getWorkDurationAttribute()
     {
         if ($this->check_in && $this->check_out) {
-            $checkIn = Carbon::parse($this->check_in);
-            $checkOut = Carbon::parse($this->check_out);
-            return $checkIn->diffInHours($checkOut);
+            return $this->check_in->diffInHours($this->check_out);
         }
+
         return null;
     }
 }
-

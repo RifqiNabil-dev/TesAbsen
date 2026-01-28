@@ -8,113 +8,163 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+{{-- 
+    @stack('scripts') --}}
     @stack('styles')
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{{ auth()->user() && auth()->user()->isAdmin() ? route('admin.dashboard') : (auth()->user() ? route('mahasiswa.dashboard') : route('login')) }}">
-                <i class="bi bi-book"></i> Sistem PKL
+
+<!-- NAVBAR -->
+<nav class="bg-blue-600 text-white"
+     x-data="{ mobileOpen:false, profileOpen:false }">
+
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="flex items-center justify-between h-16">
+
+            <!-- LEFT : BRAND -->
+            <a href="{{ auth()->user() && auth()->user()->isAdmin()
+                        ? route('admin.dashboard')
+                        : (auth()->user()
+                            ? route('mahasiswa.dashboard')
+                            : route('login')) }}"
+               class="flex items-center gap-2 font-semibold text-lg">
+                <i class="bi bi-book"></i>
+                <span>Si-Magang</span>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
+
+            <!-- HAMBURGER -->
+            @auth
+            <button @click="mobileOpen = !mobileOpen"
+                    class="md:hidden text-2xl focus:outline-none">
+                <i class="bi bi-list"></i>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                @auth
-                <ul class="navbar-nav me-auto">
-                    @if(auth()->user()->isAdmin())
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.dashboard') }}">Dashboard</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.mahasiswa.index') }}">Mahasiswa</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.groups.index') }}">Kelompok</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.schedules.index') }}">Jadwal</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.locations.index') }}">Lokasi</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.attendance.index') }}">Presensi</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.logbooks.index') }}">Logbook</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('admin.reports.index') }}">Laporan</a>
-                        </li>
-                    @else
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('mahasiswa.dashboard') }}">Dashboard</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('mahasiswa.attendance.index') }}">Presensi</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('mahasiswa.logbooks.index') }}">Logbook</a>
-                        </li>
-                    @endif
-                </ul>
-                <ul class="navbar-nav">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-person-circle"></i> {{ auth()->user()->name }}
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Profil</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <button type="submit" class="dropdown-item">Logout</button>
-                                </form>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-                @endauth
+            @endauth
+
+            <!-- MENU DESKTOP -->
+            @auth
+            <ul class="hidden md:flex gap-6 font-medium">
+                @if(auth()->user()->isAdmin())
+                    <li><a href="{{ route('admin.dashboard') }}" class="hover:underline">Dashboard</a></li>
+                    <li><a href="{{ route('admin.mahasiswa.index') }}" class="hover:underline">Mahasiswa</a></li>
+                    <li><a href="{{ route('admin.groups.index') }}" class="hover:underline">Kelompok</a></li>
+                    <li><a href="{{ route('admin.schedules.index') }}" class="hover:underline">Jadwal</a></li>
+                    <li><a href="{{ route('admin.locations.index') }}" class="hover:underline">Lokasi</a></li>
+                    <li><a href="{{ route('admin.attendance.index') }}" class="hover:underline">Presensi</a></li>
+                    <li><a href="{{ route('admin.logbooks.index') }}" class="hover:underline">Logbook</a></li>
+                    <li><a href="{{ route('admin.reports.index') }}" class="hover:underline">Laporan</a></li>
+                @else
+                    <li><a href="{{ route('mahasiswa.dashboard') }}" class="hover:underline">Dashboard</a></li>
+                    <li><a href="{{ route('mahasiswa.attendance.index') }}" class="hover:underline">Presensi</a></li>
+                    <li><a href="{{ route('mahasiswa.logbooks.index') }}" class="hover:underline">Logbook</a></li>
+                @endif
+            </ul>
+            @endauth
+
+            <!-- PROFILE DESKTOP -->
+            @auth
+            <div class="hidden md:block relative">
+                <button @click="profileOpen = !profileOpen"
+                        class="flex items-center gap-2 focus:outline-none">
+                    <i class="bi bi-person-circle text-lg"></i>
+                    <span>{{ auth()->user()->name }}</span>
+                </button>
+
+                <div x-show="profileOpen"
+                     @click.outside="profileOpen=false"
+                     class="absolute right-0 mt-2 w-40 bg-white text-gray-800 rounded shadow-md">
+                    <a href="{{ route('profile.edit') }}"
+                       class="block px-4 py-2 hover:bg-gray-100">Profil</a>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button class="w-full text-left px-4 py-2 hover:bg-gray-100">
+                            Logout
+                        </button>
+                    </form>
+                </div>
             </div>
+            @endauth
         </div>
-    </nav>
 
-    <main class="container-fluid py-4">
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
+        <!-- MOBILE MENU -->
+        @auth
+        <div x-show="mobileOpen" class="md:hidden pb-4 space-y-2">
+            @if(auth()->user()->isAdmin())
+                <a href="{{ route('admin.dashboard') }}" class="block px-2 py-1 hover:bg-blue-500 rounded">Dashboard</a>
+                <a href="{{ route('admin.mahasiswa.index') }}" class="block px-2 py-1 hover:bg-blue-500 rounded">Mahasiswa</a>
+                <a href="{{ route('admin.groups.index') }}" class="block px-2 py-1 hover:bg-blue-500 rounded">Kelompok</a>
+                <a href="{{ route('admin.schedules.index') }}" class="block px-2 py-1 hover:bg-blue-500 rounded">Jadwal</a>
+                <a href="{{ route('admin.locations.index') }}" class="block px-2 py-1 hover:bg-blue-500 rounded">Lokasi</a>
+                <a href="{{ route('admin.attendance.index') }}" class="block px-2 py-1 hover:bg-blue-500 rounded">Presensi</a>
+                <a href="{{ route('admin.logbooks.index') }}" class="block px-2 py-1 hover:bg-blue-500 rounded">Logbook</a>
+                <a href="{{ route('admin.reports.index') }}" class="block px-2 py-1 hover:bg-blue-500 rounded">Laporan</a>
+            @else
+                <a href="{{ route('mahasiswa.dashboard') }}" class="block px-2 py-1 hover:bg-blue-500 rounded">Dashboard</a>
+                <a href="{{ route('mahasiswa.attendance.index') }}" class="block px-2 py-1 hover:bg-blue-500 rounded">Presensi</a>
+                <a href="{{ route('mahasiswa.logbooks.index') }}" class="block px-2 py-1 hover:bg-blue-500 rounded">Logbook</a>
+            @endif
 
-        @if(session('error'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
+            <hr class="border-blue-400 my-2">
 
-        @if($errors->any())
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <ul class="mb-0">
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
+            <a href="{{ route('profile.edit') }}" class="block px-2 py-1 hover:bg-blue-500 rounded">Profil</a>
 
-        @yield('content')
-    </main>
-
-    <footer class="bg-light text-center py-3 mt-5">
-        <div class="container">
-            <small class="text-muted">Sistem Informasi PKL - Dinas Perpustakaan Umum dan Arsip Daerah Kota Malang</small>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button class="w-full text-left px-2 py-1 hover:bg-blue-500 rounded">
+                    Logout
+                </button>
+            </form>
         </div>
+        @endauth
+
+    </div>
+</nav>
+
+
+
+
+<!-- MAIN CONTENT -->
+<main class="max-w-7xl mx-auto px-4 py-6">
+
+    <!-- SUCCESS -->
+    @if(session('success'))
+        <div class="mb-4 flex items-center justify-between rounded bg-green-100 text-green-800 px-4 py-3">
+            <span>{{ session('success') }}</span>
+            <button onclick="this.parentElement.remove()">✕</button>
+        </div>
+    @endif
+
+    <!-- ERROR -->
+    @if(session('error'))
+        <div class="mb-4 flex items-center justify-between rounded bg-red-100 text-red-800 px-4 py-3">
+            <span>{{ session('error') }}</span>
+            <button onclick="this.parentElement.remove()">✕</button>
+        </div>
+    @endif
+
+    <!-- VALIDATION ERRORS -->
+    @if($errors->any())
+        <div class="mb-4 rounded bg-red-100 text-red-800 px-4 py-3">
+            <ul class="list-disc list-inside">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+      @yield('content')
+</main>
+
+    <footer class="bg-gray-100 py-4 text-center text-sm text-gray-500">
+        Sistem Informasi PKL - Dinas Perpustakaan Umum dan Arsip Daerah Kota Malang
     </footer>
+
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -141,6 +191,7 @@
         });
     </script>
     @stack('scripts')
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </body>
 </html>
 

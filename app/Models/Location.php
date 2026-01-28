@@ -13,12 +13,18 @@ class Location extends Model
         'name',
         'description',
         'is_active',
+        'latitude',
+        'longitude',
+        'radius',
     ];
 
     protected function casts(): array
     {
         return [
             'is_active' => 'boolean',
+            'latitude' => 'float',
+            'longitude' => 'float',
+            'radius' => 'integer',
         ];
     }
 

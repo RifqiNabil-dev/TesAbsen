@@ -25,6 +25,9 @@ class LocationController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'is_active' => ['boolean'],
+            'latitude' => ['required', 'numeric'],
+            'longitude' => ['required', 'numeric'],
+            'radius' => ['required', 'integer'],
         ]);
 
         Location::create($validated);
@@ -44,6 +47,9 @@ class LocationController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
             'is_active' => ['boolean'],
+            'latitude' => ['required', 'numeric'],
+            'longitude' => ['required', 'numeric'],
+            'radius' => ['required', 'integer'],
         ]);
 
         $location->update($validated);

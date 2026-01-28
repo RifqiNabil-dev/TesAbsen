@@ -3,88 +3,137 @@
 <?php $__env->startSection('title', 'Jadwal PKL'); ?>
 
 <?php $__env->startSection('content'); ?>
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="bi bi-calendar-event"></i> Jadwal PKL</h2>
-    <a href="<?php echo e(route('admin.schedules.create')); ?>" class="btn btn-primary">
-        <i class="bi bi-plus-circle"></i> Tambah Jadwal
-    </a>
-</div>
+<div class="max-w-7xl mx-auto space-y-6">
 
-<div class="card">
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
+    <!-- HEADER -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+            📅 Jadwal PKL
+        </h2>
+
+        <a href="<?php echo e(route('admin.schedules.create')); ?>"
+           class="inline-flex items-center gap-2 rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+            ➕ Tambah Jadwal
+        </a>
+    </div>
+
+    <!-- TABLE CARD -->
+    <div class="bg-white rounded-lg shadow border border-gray-200">
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+                <thead class="bg-gray-100 text-gray-700">
                     <tr>
-                        <th>Tanggal</th>
-                        <th>Hari</th>
-                        <th>Mahasiswa</th>
-                        <th>Kelompok</th>
-                        <th>Lokasi</th>
-                        <th>Waktu</th>
-                        <th>Aksi</th>
+                        <th class="px-4 py-3">Tanggal</th>
+                        <th class="px-4 py-3">Hari</th>
+                        <th class="px-4 py-3">Mahasiswa</th>
+                        <th class="px-4 py-3">Kelompok</th>
+                        <th class="px-4 py-3">Lokasi</th>
+                        <th class="px-4 py-3">Waktu</th>
+                        <th class="px-4 py-3 text-center">Aksi</th>
                     </tr>
                 </thead>
-                <tbody>
+
+                <tbody class="divide-y">
                     <?php $__empty_1 = true; $__currentLoopData = $schedules; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $schedule): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                        <tr>
-                            <td>
-                                <?php
-                                    $scheduleDate = is_string($schedule->date) ? \Carbon\Carbon::parse($schedule->date) : $schedule->date;
-                                    $dayNames = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-                                    $dayName = $dayNames[$scheduleDate->dayOfWeek];
-                                ?>
+                        <?php
+                            $scheduleDate = is_string($schedule->date)
+                                ? \Carbon\Carbon::parse($schedule->date)
+                                : $schedule->date;
+
+                            $dayNames = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+                            $dayName = $dayNames[$scheduleDate->dayOfWeek];
+
+                            $startTime = is_string($schedule->start_time)
+                                ? \Carbon\Carbon::parse($schedule->start_time)->format('H:i')
+                                : ($schedule->start_time instanceof \Carbon\Carbon
+                                    ? $schedule->start_time->format('H:i')
+                                    : $schedule->start_time);
+
+                            $endTime = is_string($schedule->end_time)
+                                ? \Carbon\Carbon::parse($schedule->end_time)->format('H:i')
+                                : ($schedule->end_time instanceof \Carbon\Carbon
+                                    ? $schedule->end_time->format('H:i')
+                                    : $schedule->end_time);
+                        ?>
+
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3">
                                 <?php echo e($scheduleDate->format('d/m/Y')); ?>
 
                             </td>
-                            <td>
-                                <span class="badge bg-secondary"><?php echo e($dayName); ?></span>
+
+                            <td class="px-4 py-3">
+                                <span class="inline-block rounded bg-gray-200 px-2 py-1 text-xs font-semibold text-gray-700">
+                                    <?php echo e($dayName); ?>
+
+                                </span>
                             </td>
-                            <td><?php echo e($schedule->user->name); ?></td>
-                            <td>
+
+                            <td class="px-4 py-3 font-medium">
+                                <?php echo e($schedule->user->name); ?>
+
+                            </td>
+
+                            <td class="px-4 py-3">
                                 <?php if($schedule->user->group): ?>
-                                    <span class="badge bg-info"><?php echo e($schedule->user->group->name); ?></span>
+                                    <span class="inline-block rounded bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-700">
+                                        <?php echo e($schedule->user->group->name); ?>
+
+                                    </span>
                                 <?php else: ?>
-                                    <span class="text-muted">-</span>
+                                    <span class="text-gray-400">-</span>
                                 <?php endif; ?>
                             </td>
-                            <td><?php echo e($schedule->location->name); ?></td>
-                            <td>
-                                <?php
-                                    $startTime = is_string($schedule->start_time) ? \Carbon\Carbon::parse($schedule->start_time)->format('H:i') : ($schedule->start_time instanceof \Carbon\Carbon ? $schedule->start_time->format('H:i') : $schedule->start_time);
-                                    $endTime = is_string($schedule->end_time) ? \Carbon\Carbon::parse($schedule->end_time)->format('H:i') : ($schedule->end_time instanceof \Carbon\Carbon ? $schedule->end_time->format('H:i') : $schedule->end_time);
-                                ?>
+
+                            <td class="px-4 py-3">
+                                <?php echo e($schedule->location->name); ?>
+
+                            </td>
+
+                            <td class="px-4 py-3">
                                 <?php echo e($startTime); ?> - <?php echo e($endTime); ?>
 
                             </td>
-                            <td>
-                                <a href="<?php echo e(route('admin.schedules.edit', $schedule)); ?>" class="btn btn-sm btn-warning">
-                                    <i class="bi bi-pencil"></i>
+
+                            <td class="px-4 py-3 text-center space-x-1">
+                                <a href="<?php echo e(route('admin.schedules.edit', $schedule)); ?>"
+                                   class="inline-flex items-center justify-center rounded bg-yellow-500 px-2 py-1 text-white hover:bg-yellow-600">
+                                    ✏️
                                 </a>
-                                <form action="<?php echo e(route('admin.schedules.destroy', $schedule)); ?>" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus?')">
+
+                                <form action="<?php echo e(route('admin.schedules.destroy', $schedule)); ?>"
+                                      method="POST"
+                                      class="inline"
+                                      onsubmit="return confirm('Yakin ingin menghapus?')">
                                     <?php echo csrf_field(); ?>
                                     <?php echo method_field('DELETE'); ?>
-                                    <button type="submit" class="btn btn-sm btn-danger">
-                                        <i class="bi bi-trash"></i>
+                                    <button type="submit"
+                                            class="inline-flex items-center justify-center rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600">
+                                        🗑
                                     </button>
                                 </form>
                             </td>
                         </tr>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                         <tr>
-                            <td colspan="7" class="text-center">Tidak ada data jadwal</td>
+                            <td colspan="7" class="px-4 py-6 text-center text-gray-500">
+                                Tidak ada data jadwal
+                            </td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
             </table>
         </div>
-        <div class="mt-3">
+
+        <!-- PAGINATION -->
+        <div class="px-4 py-3 border-t">
             <?php echo e($schedules->links()); ?>
 
         </div>
     </div>
+
 </div>
 <?php $__env->stopSection(); ?>
-
 
 <?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\Sistem_Magang\resources\views/admin/schedules/index.blade.php ENDPATH**/ ?>

@@ -60,10 +60,10 @@ class ScheduleController extends Controller
             // Tentukan waktu berdasarkan hari
             if ($dayOfWeek == 5) { // Jumat
                 $startTime = '07:30';
-                $endTime = '15:00';
+                $endTime = '14:30';
             } else { // Senin-Kamis (1-4)
                 $startTime = '08:00';
-                $endTime = '16:00';
+                $endTime = '15:30';
             }
 
             // Validasi: Cek apakah sudah ada kelompok lain di lokasi yang sama pada tanggal yang sama

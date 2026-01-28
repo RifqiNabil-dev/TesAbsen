@@ -3,69 +3,95 @@
 @section('title', 'Kelompok Magang')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="bi bi-people-fill"></i> Kelompok Magang</h2>
-    <a href="{{ route('admin.groups.create') }}" class="btn btn-primary">
-        <i class="bi bi-plus-circle"></i> Tambah Kelompok
-    </a>
-</div>
+<div class="space-y-4">
 
-<div class="card">
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>Nama Kelompok</th>
-                        <th>Deskripsi</th>
-                        <th>Jumlah Anggota</th>
-                        <th>Status</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($groups as $group)
-                        <tr>
-                            <td><strong>{{ $group->name }}</strong></td>
-                            <td>{{ $group->description ?? '-' }}</td>
-                            <td>
-                                <span class="badge bg-info">{{ $group->users_count }} anggota</span>
-                            </td>
-                            <td>
-                                @if($group->is_active)
-                                    <span class="badge bg-success">Aktif</span>
-                                @else
-                                    <span class="badge bg-secondary">Tidak Aktif</span>
-                                @endif
-                            </td>
-                            <td>
-                                <a href="{{ route('admin.groups.show', $group) }}" class="btn btn-sm btn-info">
-                                    <i class="bi bi-eye"></i> Detail
-                                </a>
-                                <a href="{{ route('admin.groups.edit', $group) }}" class="btn btn-sm btn-warning">
-                                    <i class="bi bi-pencil"></i> Edit
-                                </a>
-                                <form action="{{ route('admin.groups.destroy', $group) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus kelompok ini? Semua anggota akan dikeluarkan dari kelompok.')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger">
-                                        <i class="bi bi-trash"></i> Hapus
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" class="text-center">Tidak ada data kelompok</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-        <div class="mt-3">
-            {{ $groups->links() }}
-        </div>
+    <!-- HEADER -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+            👥 Kelompok Magang
+        </h2>
+
+        <a href="{{ route('admin.groups.create') }}"
+           class="inline-flex items-center gap-2 rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+            <i class="bi bi-plus-circle"></i> Tambah Kelompok
+        </a>
+    </div>
+
+    <!-- TABLE -->
+    <div class="overflow-x-auto rounded-lg border border-gray-200 bg-white">
+        <table class="w-full text-sm text-left">
+            <thead class="bg-gray-100 text-gray-700">
+                <tr>
+                    <th class="px-4 py-3">Nama Kelompok</th>
+                    <th class="px-4 py-3">Deskripsi</th>
+                    <th class="px-4 py-3">Jumlah Anggota</th>
+                    <th class="px-4 py-3">Status</th>
+                    <th class="px-4 py-3 text-center">Aksi</th>
+                </tr>
+            </thead>
+
+            <tbody class="divide-y">
+                @forelse($groups as $group)
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-3 font-semibold text-gray-800">
+                        {{ $group->name }}
+                    </td>
+
+                    <td class="px-4 py-3">
+                        {{ $group->description ?? '-' }}
+                    </td>
+
+                    <td class="px-4 py-3">
+                        <span class="inline-flex items-center rounded bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-700">
+                            {{ $group->users_count }} anggota
+                        </span>
+                    </td>
+
+                    <td class="px-4 py-3">
+                        @if($group->is_active)
+                            <span class="rounded bg-green-100 px-2 py-1 text-xs font-semibold text-green-700">
+                                Aktif
+                            </span>
+                        @else
+                            <span class="rounded bg-gray-200 px-2 py-1 text-xs font-semibold text-gray-700">
+                                Tidak Aktif
+                            </span>
+                        @endif
+                    </td>
+
+                    <td class="px-4 py-3 text-center space-x-1">
+                        <a href="{{ route('admin.groups.show', $group) }}"
+                           class="inline-block rounded bg-blue-500 px-2 py-1 text-white hover:bg-blue-600">
+                            <i class="bi bi-eye"></i>
+                        </a>
+
+                        <a href="{{ route('admin.groups.edit', $group) }}"
+                           class="inline-block rounded bg-yellow-500 px-2 py-1 text-white hover:bg-yellow-600">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+
+                        <form action="{{ route('admin.groups.destroy', $group) }}"
+                              method="POST"
+                              class="inline"
+                              onsubmit="return confirm('Yakin ingin menghapus kelompok ini? Semua anggota akan dikeluarkan dari kelompok.')">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit"
+                                    class="rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="5" class="px-4 py-6 text-center text-gray-500">
+                        Tidak ada data kelompok
+                    </td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
     </div>
 </div>
 @endsection
-

@@ -3,54 +3,82 @@
 @section('title', 'Presensi')
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="bi bi-clock-history"></i> Presensi</h2>
+
+<!-- Header -->
+<div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
+    <h2 class="text-xl sm:text-2xl font-semibold flex items-center gap-2">
+        <i class="bi bi-clock-history"></i> Presensi
+    </h2>
 </div>
 
-<div class="card">
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
+<!-- Card -->
+<div class="bg-white rounded-lg border shadow">
+    <div class="p-4 sm:p-6">
+
+        <!-- Table -->
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-sm border border-gray-200 rounded-lg">
+                <thead class="bg-gray-100">
                     <tr>
-                        <th>Tanggal</th>
-                        <th>Lokasi</th>
-                        <th>Check In</th>
-                        <th>Check Out</th>
-                        <th>Durasi</th>
-                        <th>Status</th>
+                        <th class="p-3 text-left">Tanggal</th>
+                        <th class="p-3 text-left">Lokasi</th>
+                        <th class="p-3 text-left">Check In</th>
+                        <th class="p-3 text-left">Check Out</th>
+                        <th class="p-3 text-left">Durasi</th>
+                        <th class="p-3 text-left">Status</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y">
                     @forelse($attendances as $attendance)
-                        <tr>
-                            <td>{{ $attendance->date->format('d/m/Y') }}</td>
-                            <td>{{ $attendance->location->name ?? '-' }}</td>
-                            <td>{{ $attendance->check_in ? $attendance->check_in->format('H:i') : '-' }}</td>
-                            <td>{{ $attendance->check_out ? $attendance->check_out->format('H:i') : '-' }}</td>
-                            <td>{{ $attendance->work_duration ? $attendance->work_duration . ' jam' : '-' }}</td>
-                            <td>
+                        <tr class="hover:bg-gray-50">
+                            <td class="p-3">
+                                {{ $attendance->date->format('d/m/Y') }}
+                            </td>
+                            <td class="p-3">
+                                {{ $attendance->location->name ?? '-' }}
+                            </td>
+                            <td class="p-3">
+                                {{ $attendance->check_in ? $attendance->check_in->format('H:i') : '-' }}
+                            </td>
+                            <td class="p-3">
+                                {{ $attendance->check_out ? $attendance->check_out->format('H:i') : '-' }}
+                            </td>
+                            <td class="p-3">
+                                {{ $attendance->work_duration ? $attendance->work_duration . ' jam' : '-' }}
+                            </td>
+                            <td class="p-3">
                                 @if($attendance->status === 'hadir')
-                                    <span class="badge bg-success">Hadir</span>
+                                    <span class="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-medium">
+                                        Hadir
+                                    </span>
                                 @elseif($attendance->status === 'terlambat')
-                                    <span class="badge bg-warning">Terlambat</span>
+                                    <span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded text-xs font-medium">
+                                        Terlambat
+                                    </span>
                                 @else
-                                    <span class="badge bg-danger">Tidak Hadir</span>
+                                    <span class="bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-medium">
+                                        Tidak Hadir
+                                    </span>
                                 @endif
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center">Belum ada data presensi</td>
+                            <td colspan="6" class="p-6 text-center text-gray-500">
+                                Belum ada data presensi
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
-        <div class="mt-3">
+
+        <!-- Pagination -->
+        <div class="mt-4">
             {{ $attendances->links() }}
         </div>
+
     </div>
 </div>
-@endsection
 
+@endsection

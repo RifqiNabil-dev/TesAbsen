@@ -32,5 +32,7 @@ class AttendanceController extends Controller
         $attendance->load(['user', 'location']);
         return view('admin.attendance.show', compact('attendance'));
     }
+
+    
 }
 

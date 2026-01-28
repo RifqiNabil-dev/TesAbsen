@@ -3,50 +3,105 @@
 @section('title', 'Tambah Logbook')
 
 @section('content')
-<div class="card">
-    <div class="card-header">
-        <h5 class="mb-0">Tambah Logbook</h5>
+
+<!-- Card -->
+<div class="max-w-3xl mx-auto border bg-white rounded-lg shadow">
+    <div class="px-6 py-4 border-b">
+        <h5 class="text-lg font-semibold">Tambah Logbook</h5>
     </div>
-    <div class="card-body">
+
+    <div class="p-6">
         <form method="POST" action="{{ route('mahasiswa.logbooks.store') }}">
             @csrf
 
-            <div class="mb-3">
-                <label for="date" class="form-label">Tanggal <span class="text-danger">*</span></label>
-                <input type="text" class="form-control datepicker" id="date" name="date" value="{{ old('date', today()->format('Y-m-d')) }}" placeholder="Pilih tanggal" required>
+            <!-- Tanggal -->
+            <div class="mb-4">
+                <label for="date" class="block text-sm font-medium mb-1">
+                    Tanggal <span class="text-red-500">*</span>
+                </label>
+                <input type="text"
+                       id="date"
+                       name="date"
+                       value="{{ old('date', today()->format('Y-m-d')) }}"
+                       placeholder="Pilih tanggal"
+                       required
+                       class="w-full rounded-lg border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200
+                              px-3 py-2 datepicker">
             </div>
 
-            <div class="mb-3">
-                <label for="activity" class="form-label">Aktivitas <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="activity" name="activity" value="{{ old('activity') }}" required>
+            <!-- Aktivitas -->
+            <div class="mb-4">
+                <label for="activity" class="block text-sm font-medium mb-1">
+                    Aktivitas <span class="text-red-500">*</span>
+                </label>
+                <input type="text"
+                       id="activity"
+                       name="activity"
+                       value="{{ old('activity') }}"
+                       required
+                       class="w-full rounded-lg border border-gray-900 focus:border-blue-500 focus:ring focus:ring-blue-200
+                              px-3 py-2">
             </div>
 
-            <div class="mb-3">
-                <label for="description" class="form-label">Deskripsi Kegiatan <span class="text-danger">*</span></label>
-                <textarea class="form-control" id="description" name="description" rows="5" required>{{ old('description') }}</textarea>
+            <!-- Deskripsi -->
+            <div class="mb-4">
+                <label for="description" class="block text-sm font-medium mb-1">
+                    Deskripsi Kegiatan <span class="text-red-500">*</span>
+                </label>
+                <textarea id="description"
+                          name="description"
+                          rows="5"
+                          required
+                          class="w-full rounded-lg border border-gray-900 focus:border-blue-500 focus:ring focus:ring-blue-200
+                                 px-3 py-2">{{ old('description') }}</textarea>
             </div>
 
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label for="start_time" class="form-label">Waktu Mulai <span class="text-danger">*</span></label>
-                        <input type="time" class="form-control" id="start_time" name="start_time" value="{{ old('start_time') }}" required>
-                    </div>
+            <!-- Waktu -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div>
+                    <label for="start_time" class="block text-sm font-medium mb-1">
+                        Waktu Mulai <span class="text-red-500">*</span>
+                    </label>
+                    <input type="time"
+                           id="start_time"
+                           name="start_time"
+                           value="{{ old('start_time') }}"
+                           required
+                           class="w-full rounded-lg border border-gray-900 focus:border-blue-500 focus:ring focus:ring-blue-200
+                                  px-3 py-2">
                 </div>
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label for="end_time" class="form-label">Waktu Selesai <span class="text-danger">*</span></label>
-                        <input type="time" class="form-control" id="end_time" name="end_time" value="{{ old('end_time') }}" required>
-                    </div>
+
+                <div>
+                    <label for="end_time" class="block text-sm font-medium mb-1">
+                        Waktu Selesai <span class="text-red-500">*</span>
+                    </label>
+                    <input type="time"
+                           id="end_time"
+                           name="end_time"
+                           value="{{ old('end_time') }}"
+                           required
+                           class="w-full rounded-lg border border-gray-900 focus:border-blue-500 focus:ring focus:ring-blue-200
+                                  px-3 py-2">
                 </div>
             </div>
 
-            <div class="d-flex justify-content-between">
-                <a href="{{ route('mahasiswa.logbooks.index') }}" class="btn btn-secondary">Batal</a>
-                <button type="submit" class="btn btn-primary">Simpan</button>
+            <!-- Action -->
+            <div class="flex flex-col sm:flex-row justify-between gap-3">
+                <a href="{{ route('mahasiswa.logbooks.index') }}"
+                   class="w-full sm:w-auto text-center bg-gray-500 hover:bg-gray-600 text-white
+                          px-5 py-2 rounded-lg">
+                    Batal
+                </a>
+
+                <button type="submit"
+                        class="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white
+                               px-6 py-2 rounded-lg font-medium">
+                    Simpan
+                </button>
             </div>
+
         </form>
     </div>
 </div>
-@endsection
 
+@endsection

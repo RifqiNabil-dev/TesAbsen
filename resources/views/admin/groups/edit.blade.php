@@ -3,72 +3,149 @@
 @section('title', 'Edit Kelompok')
 
 @section('content')
-<div class="card">
-    <div class="card-header">
-        <h5 class="mb-0">Edit Kelompok</h5>
+<div
+    x-data="{ search: '' }"
+    class="max-w-4xl mx-auto bg-white rounded-lg shadow border border-gray-200"
+>
+
+    <!-- HEADER -->
+    <div class="border-b px-6 py-4">
+        <h2 class="text-lg font-bold text-gray-800">Edit Kelompok</h2>
     </div>
-    <div class="card-body">
+
+    <!-- BODY -->
+    <div class="p-6">
         <form method="POST" action="{{ route('admin.groups.update', $group) }}">
             @csrf
             @method('PUT')
 
-            <div class="mb-3">
-                <label for="name" class="form-label">Nama Kelompok <span class="text-danger">*</span></label>
-                <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $group->name) }}" required>
+            <!-- NAMA -->
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-1">
+                    Nama Kelompok <span class="text-red-500">*</span>
+                </label>
+                <input
+                    type="text"
+                    name="name"
+                    value="{{ old('name', $group->name) }}"
+                    required
+                    class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200"
+                >
                 @error('name')
-                    <div class="invalid-feedback">{{ $message }}</div>
+                    <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
                 @enderror
             </div>
 
-            <div class="mb-3">
-                <label for="description" class="form-label">Deskripsi</label>
-                <textarea class="form-control" id="description" name="description" rows="3">{{ old('description', $group->description) }}</textarea>
+            <!-- DESKRIPSI -->
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-1">Deskripsi</label>
+                <textarea
+                    name="description"
+                    rows="3"
+                    class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200"
+                >{{ old('description', $group->description) }}</textarea>
             </div>
 
-            <div class="mb-3">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="is_active" name="is_active" value="1" {{ old('is_active', $group->is_active) ? 'checked' : '' }}>
-                    <label class="form-check-label" for="is_active">
-                        Aktif
-                    </label>
-                </div>
+            <!-- STATUS -->
+            <div class="mb-6">
+                <label class="inline-flex items-center gap-2">
+                    <input
+                        type="checkbox"
+                        name="is_active"
+                        value="1"
+                        {{ old('is_active', $group->is_active) ? 'checked' : '' }}
+                        class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    >
+                    <span class="text-sm">Aktif</span>
+                </label>
             </div>
 
-            <hr class="my-4">
+            <hr class="my-6">
 
+            <!-- SEARCH BAR -->
             <div class="mb-3">
-                <label class="form-label">Pilih Mahasiswa untuk Kelompok</label>
-                <div class="border rounded p-3" style="max-height: 300px; overflow-y: auto;">
-                    @forelse($availableMahasiswa as $mahasiswa)
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" name="user_ids[]" value="{{ $mahasiswa->id }}" id="user_{{ $mahasiswa->id }}" 
-                                {{ (old('user_ids') ? in_array($mahasiswa->id, old('user_ids')) : $mahasiswa->group_id == $group->id) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="user_{{ $mahasiswa->id }}">
-                                <strong>{{ $mahasiswa->name }}</strong>
-                                <small class="text-muted">({{ $mahasiswa->email }})</small>
-                                @if($mahasiswa->nim)
-                                    <br><small class="text-muted">NIM: {{ $mahasiswa->nim }}</small>
-                                @endif
-                                @if($mahasiswa->group_id == $group->id)
-                                    <span class="badge bg-success ms-2">Anggota saat ini</span>
-                                @elseif($mahasiswa->group_id)
-                                    <span class="badge bg-warning ms-2">Di kelompok lain</span>
-                                @endif
-                            </label>
+                <label class="block text-sm font-semibold mb-1">
+                    Cari Mahasiswa
+                </label>
+                <input
+                    type="text"
+                    x-model="search"
+                    placeholder="Cari nama, email, atau NIM..."
+                    class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200"
+                >
+            </div>
+
+            <!-- LIST MAHASISWA -->
+            <div class="border rounded max-h-[320px] overflow-y-auto p-3 space-y-2">
+                @forelse($availableMahasiswa as $mahasiswa)
+                <label
+                    x-show="
+                        '{{ strtolower($mahasiswa->name.' '.$mahasiswa->email.' '.$mahasiswa->nim) }}'
+                        .includes(search.toLowerCase())
+                    "
+                    class="flex items-start gap-3 rounded p-3 hover:bg-gray-50 cursor-pointer border"
+                >
+                    <input
+                        type="checkbox"
+                        name="user_ids[]"
+                        value="{{ $mahasiswa->id }}"
+                        class="mt-1 rounded border-gray-300 text-blue-600"
+                        {{ (old('user_ids') ? in_array($mahasiswa->id, old('user_ids')) : $mahasiswa->group_id == $group->id) ? 'checked' : '' }}
+                    >
+
+                    <div class="text-sm">
+                        <p class="font-semibold text-gray-800">
+                            {{ $mahasiswa->name }}
+                        </p>
+                        <p class="text-xs text-gray-500">
+                            {{ $mahasiswa->email }}
+                            @if($mahasiswa->nim)
+                                • NIM: {{ $mahasiswa->nim }}
+                            @endif
+                        </p>
+
+                        <div class="mt-1">
+                            @if($mahasiswa->group_id == $group->id)
+                                <span class="inline-block rounded bg-green-100 px-2 py-0.5 text-xs text-green-700">
+                                    Anggota saat ini
+                                </span>
+                            @elseif($mahasiswa->group_id)
+                                <span class="inline-block rounded bg-yellow-100 px-2 py-0.5 text-xs text-yellow-700">
+                                    Kelompok lain
+                                </span>
+                            @endif
                         </div>
-                    @empty
-                        <p class="text-muted mb-0">Tidak ada mahasiswa yang tersedia</p>
-                    @endforelse
-                </div>
-                <small class="form-text text-muted">Centang mahasiswa yang ingin ditambahkan ke kelompok ini. Mahasiswa yang sudah di kelompok lain akan dipindahkan ke kelompok ini.</small>
+                    </div>
+                </label>
+                @empty
+                    <p class="text-sm text-gray-500 text-center">
+                        Tidak ada mahasiswa tersedia
+                    </p>
+                @endforelse
             </div>
 
-            <div class="d-flex justify-content-between">
-                <a href="{{ route('admin.groups.index') }}" class="btn btn-secondary">Batal</a>
-                <button type="submit" class="btn btn-primary">Simpan</button>
+            <p class="text-xs text-gray-500 mt-2">
+                Centang mahasiswa yang ingin menjadi anggota kelompok ini.
+                Mahasiswa dari kelompok lain akan otomatis dipindahkan.
+            </p>
+
+            <!-- ACTION -->
+            <div class="flex justify-between items-center mt-6">
+                <a
+                    href="{{ route('admin.groups.index') }}"
+                    class="rounded bg-gray-500 px-4 py-2 text-sm text-white hover:bg-gray-600"
+                >
+                    Batal
+                </a>
+
+                <button
+                    type="submit"
+                    class="rounded bg-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+                >
+                    Simpan Perubahan
+                </button>
             </div>
         </form>
     </div>
 </div>
 @endsection
-

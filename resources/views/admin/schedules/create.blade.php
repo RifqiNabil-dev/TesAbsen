@@ -3,35 +3,86 @@
 @section('title', 'Tambah Jadwal')
 
 @section('content')
-<div class="card">
-    <div class="card-header">
-        <h5 class="mb-0">Tambah Jadwal</h5>
+<div class="max-w-3xl mx-auto bg-white rounded-lg shadow border border-gray-200">
+
+    <!-- HEADER -->
+    <div class="border-b px-6 py-4">
+        <h2 class="text-lg font-semibold text-gray-800">
+            ➕ Tambah Jadwal
+        </h2>
     </div>
-    <div class="card-body">
-        <form method="POST" action="{{ route('admin.schedules.store') }}">
+
+    <!-- BODY -->
+    <div class="p-6">
+        <form method="POST" action="{{ route('admin.schedules.store') }}" class="space-y-5">
             @csrf
 
-            <div class="mb-3">
-                <label for="user_id" class="form-label">Mahasiswa <span class="text-danger">*</span></label>
-                <select class="form-select @error('user_id') is-invalid @enderror" id="user_id" name="user_id" required>
-                    <option value="">Pilih Mahasiswa</option>
+            <!-- MAHASISWA SEARCH -->
+            <div x-data="{ search: '' }" class="mb-4">
+                <label class="block text-sm font-semibold mb-1">
+                    Mahasiswa <span class="text-red-500">*</span>
+                </label>
+
+                <!-- SEARCH BAR -->
+                <input
+                    type="text"
+                    x-model="search"
+                    placeholder="Cari nama, email, atau kelompok..."
+                    class="w-full rounded border border-gray-900 px-3 py-2 text-sm
+                        focus:ring focus:ring-blue-200 mb-3"
+                >
+
+                <!-- LIST MAHASISWA -->
+                <div class="border rounded max-h-[300px] overflow-y-auto p-3 space-y-2">
                     @foreach($mahasiswa as $mhs)
-                        <option value="{{ $mhs->id }}" {{ old('user_id') == $mhs->id ? 'selected' : '' }}>
-                            {{ $mhs->name }}
-                            @if($mhs->group)
-                                - {{ $mhs->group->name }}
-                            @endif
-                        </option>
+                    <label
+                        x-show="
+                            '{{ strtolower($mhs->name.' '.$mhs->email.' '.($mhs->group->name ?? '')) }}'
+                            .includes(search.toLowerCase())
+                        "
+                        class="flex items-start gap-3 rounded p-3 border
+                            hover:bg-gray-50 cursor-pointer"
+                    >
+                        <input
+                            type="radio"
+                            name="user_id"
+                            value="{{ $mhs->id }}"
+                            required
+                            class="mt-1 text-blue-600 focus:ring-blue-500"
+                            {{ old('user_id') == $mhs->id ? 'checked' : '' }}
+                        >
+
+                        <div class="text-sm">
+                            <p class="font-semibold text-gray-800">
+                                {{ $mhs->name }}
+                            </p>
+                            <p class="text-xs text-gray-500">
+                                {{ $mhs->email }}
+                                @if($mhs->group)
+                                    • {{ $mhs->group->name }}
+                                @endif
+                            </p>
+                        </div>
+                    </label>
                     @endforeach
-                </select>
+                </div>
+
                 @error('user_id')
-                    <div class="invalid-feedback">{{ $message }}</div>
+                    <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
                 @enderror
             </div>
 
-            <div class="mb-3">
-                <label for="location_id" class="form-label">Lokasi <span class="text-danger">*</span></label>
-                <select class="form-select" id="location_id" name="location_id" required>
+
+            <!-- LOKASI -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Lokasi <span class="text-red-500">*</span>
+                </label>
+                <select
+                    name="location_id"
+                    required
+                    class="w-full rounded border border-gray-900 px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                >
                     <option value="">Pilih Lokasi</option>
                     @foreach($locations as $location)
                         <option value="{{ $location->id }}" {{ old('location_id') == $location->id ? 'selected' : '' }}>
@@ -41,93 +92,133 @@
                 </select>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label">Periode Jadwal <span class="text-danger">*</span></label>
-                <div class="row">
-                    <div class="col-md-6">
-                        <label for="start_date" class="form-label small">Tanggal Mulai</label>
-                        <input type="text" class="form-control datepicker @error('start_date') is-invalid @enderror" id="start_date" name="start_date" value="{{ old('start_date') }}" placeholder="Pilih tanggal mulai" required>
+            <!-- PERIODE -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Periode Jadwal <span class="text-red-500">*</span>
+                </label>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs text-gray-500">Tanggal Mulai</label>
+                        <input
+                            type="text"
+                            id="start_date"
+                            name="start_date"
+                            value="{{ old('start_date') }}"
+                            required
+                            class="datepicker w-full rounded border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                        >
                         @error('start_date')
-                            <div class="invalid-feedback">{{ $message }}</div>
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                         @enderror
                     </div>
-                    <div class="col-md-6">
-                        <label for="end_date" class="form-label small">Tanggal Selesai</label>
-                        <input type="text" class="form-control datepicker @error('end_date') is-invalid @enderror" id="end_date" name="end_date" value="{{ old('end_date') }}" placeholder="Pilih tanggal selesai" required>
+
+                    <div>
+                        <label class="text-xs text-gray-500">Tanggal Selesai</label>
+                        <input
+                            type="text"
+                            id="end_date"
+                            name="end_date"
+                            value="{{ old('end_date') }}"
+                            required
+                            class="datepicker w-full rounded border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                        >
                         @error('end_date')
-                            <div class="invalid-feedback">{{ $message }}</div>
+                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
                         @enderror
                     </div>
                 </div>
-                <small class="form-text text-muted">
-                    <i class="bi bi-info-circle"></i> Sistem akan otomatis membuat jadwal untuk hari kerja (Senin-Jumat) dengan waktu:
-                    <br>• Senin s.d Kamis: 08:00 - 16:00 WIB
-                    <br>• Jumat: 07:30 - 15:00 WIB
-                </small>
+
+                <p class="mt-3 text-sm text-gray-500">
+                    ℹ️ Jadwal otomatis dibuat untuk hari kerja (Senin–Jumat)
+                    <br>• Senin–Kamis: <b>08:00 – 15:30</b>
+                    <br>• Jumat: <b>07:30 – 14:30</b>
+                </p>
             </div>
 
-            <div class="alert alert-info">
-                <i class="bi bi-calendar-check"></i> <strong>Info:</strong> Jadwal akan dibuat otomatis untuk setiap hari kerja dalam periode yang dipilih. Sabtu dan Minggu akan dilewati.
+            <!-- INFO -->
+            <div class="rounded bg-blue-50 border border-blue-200 p-4 text-sm text-blue-800">
+                📅 <strong>Info:</strong> Sabtu dan Minggu akan dilewati secara otomatis.
             </div>
 
-            <div class="mb-3">
-                <label for="notes" class="form-label">Catatan</label>
-                <textarea class="form-control" id="notes" name="notes" rows="3">{{ old('notes') }}</textarea>
+            <!-- CATATAN -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    Catatan
+                </label>
+                <textarea
+                    name="notes"
+                    rows="3"
+                    class="w-full border border-gray-900 px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
+                >{{ old('notes') }}</textarea>
             </div>
 
-            <div class="d-flex justify-content-between">
-                <a href="{{ route('admin.schedules.index') }}" class="btn btn-secondary">Batal</a>
-                <button type="submit" class="btn btn-primary">Simpan</button>
+            <!-- ACTION -->
+            <div class="flex justify-between">
+                <a href="{{ route('admin.schedules.index') }}"
+                   class="px-4 py-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300">
+                    Batal
+                </a>
+
+                <button type="submit"
+                        class="px-5 py-2 rounded bg-blue-600 text-white hover:bg-blue-700">
+                    Simpan
+                </button>
             </div>
+
         </form>
     </div>
 </div>
 
-@push('scripts')
+{{-- SEARCH MAHASISWA --}}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const startDateInput = document.getElementById('start_date');
-        const endDateInput = document.getElementById('end_date');
-        
-        if (startDateInput && endDateInput && !startDateInput.hasAttribute('data-fp-initialized')) {
-            const startPicker = flatpickr(startDateInput, {
-                dateFormat: 'Y-m-d',
-                locale: 'id',
-                allowInput: true,
-                altInput: true,
-                altFormat: 'd/m/Y',
-                altInputClass: 'form-control',
-                disableMobile: true,
-                monthSelectorType: 'static',
-                yearSelectorType: 'static',
-                static: true,
-                onChange: function(selectedDates) {
-                    if (selectedDates.length > 0) {
-                        endPicker.set('minDate', selectedDates[0]);
-                    }
-                }
-            });
-            
-            const endPicker = flatpickr(endDateInput, {
-                dateFormat: 'Y-m-d',
-                locale: 'id',
-                allowInput: true,
-                altInput: true,
-                altFormat: 'd/m/Y',
-                altInputClass: 'form-control',
-                disableMobile: true,
-                monthSelectorType: 'static',
-                yearSelectorType: 'static',
-                static: true,
-                minDate: startDateInput.value || 'today'
-            });
-            
-            startDateInput.setAttribute('data-fp-initialized', 'true');
-            endDateInput.setAttribute('data-fp-initialized', 'true');
+document.getElementById('searchMahasiswa').addEventListener('keyup', function () {
+    let keyword = this.value.toLowerCase();
+    let options = document.querySelectorAll('#user_id option');
+
+    options.forEach(option => {
+        option.style.display = option.text.toLowerCase().includes(keyword)
+            ? 'block'
+            : 'none';
+    });
+});
+</script>
+
+{{-- FLATPICKR --}}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const start = flatpickr("#start_date", {
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "d/m/Y",
+        locale: "id",
+        onChange: function(selectedDates) {
+            end.set('minDate', selectedDates[0]);
         }
     });
+
+    const end = flatpickr("#end_date", {
+        dateFormat: "Y-m-d",
+        altInput: true,
+        altFormat: "d/m/Y",
+        locale: "id",
+        minDate: "today"
+    });
+});
 </script>
-@endpush
+
+<script>
+document.getElementById('searchMahasiswa').addEventListener('keyup', function () {
+    const keyword = this.value.toLowerCase();
+    const options = document.querySelectorAll('#user_id option');
+
+    options.forEach(option => {
+        option.style.display = option.text.toLowerCase().includes(keyword)
+            ? 'block'
+            : 'none';
+    });
+});
+</script>
+
 @endsection
-
-
