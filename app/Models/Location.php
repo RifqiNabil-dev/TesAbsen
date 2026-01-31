@@ -11,12 +11,18 @@ class Location extends Model
 
     protected $fillable = [
         'name',
-        'description',
-        'is_active',
         'latitude',
         'longitude',
         'radius',
+        'division_id',
+        'description',
+        'tasks'
     ];
+
+    public function division()
+    {
+        return $this->belongsTo(Division::class);
+    }
 
     protected function casts(): array
     {

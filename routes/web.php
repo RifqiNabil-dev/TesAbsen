@@ -12,6 +12,8 @@ use App\Http\Controllers\Admin\GroupController;
 use App\Http\Controllers\Mahasiswa\DashboardController as MahasiswaDashboard;
 use App\Http\Controllers\Mahasiswa\AttendanceController as MahasiswaAttendance;
 use App\Http\Controllers\Mahasiswa\LogbookController as MahasiswaLogbook;
+use App\Http\Controllers\Mahasiswa\ScheduleController as MahasiswaSchedule;
+
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -27,21 +29,24 @@ Route::middleware('auth')->group(function () {
 // Admin Routes
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('dashboard');
-    
+
     Route::resource('mahasiswa', MahasiswaController::class);
+    Route::get('schedules/print', [ScheduleController::class, 'print'])->name('schedules.print');
+    Route::delete('schedules/bulk-destroy', [ScheduleController::class, 'bulkDestroy'])->name('schedules.bulk-destroy');
     Route::resource('schedules', ScheduleController::class);
+
     Route::resource('locations', LocationController::class);
     Route::resource('groups', GroupController::class);
     Route::post('/groups/{group}/members', [GroupController::class, 'addMember'])->name('groups.add-member');
     Route::delete('/groups/{group}/members/{user}', [GroupController::class, 'removeMember'])->name('groups.remove-member');
-    
+
     Route::get('/attendance', [AdminAttendance::class, 'index'])->name('attendance.index');
     Route::get('/attendance/{attendance}', [AdminAttendance::class, 'show'])->name('attendance.show');
-    
+
     Route::get('/logbooks', [AdminLogbook::class, 'index'])->name('logbooks.index');
     Route::get('/logbooks/{logbook}', [AdminLogbook::class, 'show'])->name('logbooks.show');
     Route::patch('/logbooks/{logbook}/approve', [AdminLogbook::class, 'approve'])->name('logbooks.approve');
-    
+
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/{user}', [ReportController::class, 'show'])->name('reports.show');
     Route::post('/reports/{user}/assessment', [ReportController::class, 'storeAssessment'])->name('reports.assessment');
@@ -50,13 +55,16 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 // Mahasiswa Routes
 Route::middleware(['auth', 'role:mahasiswa'])->prefix('mahasiswa')->name('mahasiswa.')->group(function () {
     Route::get('/dashboard', [MahasiswaDashboard::class, 'index'])->name('dashboard');
-    
+
     Route::get('/attendance', [MahasiswaAttendance::class, 'index'])->name('attendance.index');
     Route::post('/attendance/checkin', [MahasiswaAttendance::class, 'checkin'])->name('attendance.checkin');
     Route::post('/attendance/checkout', [MahasiswaAttendance::class, 'checkout'])->name('attendance.checkout');
-    
+
     Route::resource('logbooks', MahasiswaLogbook::class);
+    Route::get('/schedules', [MahasiswaSchedule::class, 'index'])->name('schedules.index');
+    Route::get('/locations', [App\Http\Controllers\Mahasiswa\LocationController::class, 'index'])->name('locations.index');
+
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 

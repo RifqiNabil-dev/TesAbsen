@@ -11,8 +11,8 @@ class Schedule extends Model
 
     protected $fillable = [
         'user_id',
-        'location_id',
         'date',
+
         'start_time',
         'end_time',
         'notes',
@@ -27,9 +27,10 @@ class Schedule extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function location()
+    public function locations()
     {
-        return $this->belongsTo(Location::class);
+        return $this->belongsToMany(Location::class, 'schedule_location');
     }
+
 }
 

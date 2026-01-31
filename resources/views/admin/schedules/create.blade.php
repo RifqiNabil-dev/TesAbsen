@@ -20,7 +20,7 @@
             <!-- MAHASISWA SEARCH -->
             <div x-data="{ search: '' }" class="mb-4">
                 <label class="block text-sm font-semibold mb-1">
-                    Mahasiswa <span class="text-red-500">*</span>
+                    Peserta <span class="text-red-500">*</span>
                 </label>
 
                 <!-- SEARCH BAR -->
@@ -76,20 +76,38 @@
             <!-- LOKASI -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
-                    Lokasi <span class="text-red-500">*</span>
+                    Lokasi (Pilih 1-3) <span class="text-red-500">*</span>
                 </label>
-                <select
-                    name="location_id"
-                    required
-                    class="w-full rounded border border-gray-900 px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                    <option value="">Pilih Lokasi</option>
-                    @foreach($locations as $location)
-                        <option value="{{ $location->id }}" {{ old('location_id') == $location->id ? 'selected' : '' }}>
-                            {{ $location->name }}
-                        </option>
+                
+                <div class="border rounded p-3 max-h-[300px] overflow-y-auto space-y-4">
+                    @foreach($locations->groupBy('division.name') as $divisionName => $divLocations)
+                        <div>
+                            <h4 class="font-bold text-xs uppercase text-gray-500 mb-2 border-b pb-1">
+                                {{ $divisionName ?? 'Lainnya' }}
+                            </h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                @foreach($divLocations as $location)
+                                    <label class="flex items-center space-x-2 text-sm cursor-pointer p-1 hover:bg-gray-50 rounded">
+                                        <input 
+                                            type="checkbox" 
+                                            name="location_ids[]" 
+                                            value="{{ $location->id }}"
+                                            class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                            {{ in_array($location->id, old('location_ids', [])) ? 'checked' : '' }}
+                                        >
+                                        <span class="text-gray-700">{{ $location->name }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
                     @endforeach
-                </select>
+                </div>
+                @error('location_ids')
+                    <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                @enderror
+                @error('location_ids.*')
+                    <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                @enderror
             </div>
 
             <!-- PERIODE -->
@@ -191,7 +209,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const start = flatpickr("#start_date", {
         dateFormat: "Y-m-d",
         altInput: true,
-        altFormat: "d/m/Y",
+        altFormat: "d-m-Y",
         locale: "id",
         onChange: function(selectedDates) {
             end.set('minDate', selectedDates[0]);
@@ -201,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const end = flatpickr("#end_date", {
         dateFormat: "Y-m-d",
         altInput: true,
-        altFormat: "d/m/Y",
+        altFormat: "d-m-Y",
         locale: "id",
         minDate: "today"
     });

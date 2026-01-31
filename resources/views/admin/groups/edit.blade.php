@@ -65,7 +65,7 @@
             <!-- SEARCH BAR -->
             <div class="mb-3">
                 <label class="block text-sm font-semibold mb-1">
-                    Cari Mahasiswa
+                    Cari Peserta
                 </label>
                 <input
                     type="text"
@@ -126,7 +126,7 @@
 
             <p class="text-xs text-gray-500 mt-2">
                 Centang mahasiswa yang ingin menjadi anggota kelompok ini.
-                Mahasiswa dari kelompok lain akan otomatis dipindahkan.
+                Peserta dari kelompok lain akan otomatis dipindahkan.
             </p>
 
             <!-- ACTION -->

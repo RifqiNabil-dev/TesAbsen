@@ -1,138 +1,90 @@
 @extends('layouts.app')
 
-@section('title', 'Logbook')
+@section('title', 'Data Logbook')
 
 @section('content')
+    <div class="space-y-4">
 
-<!-- HEADER -->
-<div class="flex items-center justify-between mb-6">
-    <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
-        <i class="bi bi-journal-text"></i>
-        Logbook
-    </h2>
-</div>
+        <!-- HEADER -->
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+            <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                <i class="bi bi-journal-text"></i>
+                Data Logbook
+            </h2>
+        </div>
 
-<!-- FILTER -->
-<div class="bg-white rounded-lg shadow border border-gray-200 mb-6">
-    <div class="p-6">
-        <form method="GET" action="{{ route('admin.logbooks.index') }}"
-              class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-
-            <!-- STATUS -->
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-1">
-                    Status
-                </label>
-                <select
-                    name="status"
-                    class="w-full rounded border border-gray-300 px-3 py-2 text-sm
-                           focus:ring focus:ring-blue-200 focus:border-blue-500"
-                >
-                    <option value="">Semua</option>
-                    <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>
-                        Pending
-                    </option>
-                    <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>
-                        Disetujui
-                    </option>
-                    <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>
-                        Ditolak
-                    </option>
-                </select>
+        <!-- SEARCH -->
+        <form method="GET" action="{{ route('admin.logbooks.index') }}">
+            <div class="relative">
+                <input type="text" name="search" value="{{ request('search') }}" 
+                       placeholder="Cari nama peserta..."
+                       class="w-full md:w-1/3 rounded-lg border border-gray-300 px-4 py-2 pl-10 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                <i class="bi bi-search absolute left-3 top-2.5 text-gray-400"></i>
             </div>
-
-            <!-- BUTTON -->
-            <div class="flex gap-2">
-                <button
-                    type="submit"
-                    class="rounded bg-blue-600 px-4 py-2 text-sm font-semibold
-                           text-white hover:bg-blue-700"
-                >
-                    Filter
-                </button>
-
-                <a
-                    href="{{ route('admin.logbooks.index') }}"
-                    class="rounded bg-gray-500 px-4 py-2 text-sm text-white hover:bg-gray-600"
-                >
-                    Reset
-                </a>
-            </div>
-
         </form>
-    </div>
-</div>
 
-<!-- TABLE -->
-<div class="bg-white rounded-lg shadow border border-gray-200">
-    <div class="p-6 overflow-x-auto">
-        <table class="min-w-full text-sm text-left">
-            <thead class="bg-gray-100 text-gray-700 uppercase text-xs">
-                <tr>
-                    <th class="px-4 py-3">Tanggal</th>
-                    <th class="px-4 py-3">Mahasiswa</th>
-                    <th class="px-4 py-3">Aktivitas</th>
-                    <th class="px-4 py-3">Waktu</th>
-                    <th class="px-4 py-3">Status</th>
-                    <th class="px-4 py-3">Aksi</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y">
-                @forelse($logbooks as $logbook)
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-3">
-                            {{ $logbook->date->format('d/m/Y') }}
-                        </td>
-                        <td class="px-4 py-3">
-                            {{ $logbook->user->name }}
-                        </td>
-                        <td class="px-4 py-3">
-                            {{ Str::limit($logbook->activity, 40) }}
-                        </td>
-                        <td class="px-4 py-3">
-                            {{ $logbook->start_time }} - {{ $logbook->end_time }}
-                        </td>
-                        <td class="px-4 py-3">
-                            @if($logbook->status === 'pending')
-                                <span class="inline-block rounded bg-yellow-100 px-3 py-1 text-xs font-semibold text-yellow-700">
-                                    Pending
-                                </span>
-                            @elseif($logbook->status === 'approved')
-                                <span class="inline-block rounded bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
-                                    Disetujui
-                                </span>
-                            @else
-                                <span class="inline-block rounded bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">
-                                    Ditolak
-                                </span>
-                            @endif
-                        </td>
-                        <td class="px-4 py-3">
-                            <a
-                                href="{{ route('admin.logbooks.show', $logbook) }}"
-                                class="inline-flex items-center gap-1 rounded bg-sky-600 px-3 py-1.5
-                                       text-xs font-semibold text-white hover:bg-sky-700"
-                            >
-                                <i class="bi bi-eye"></i>
-                                Detail
-                            </a>
-                        </td>
-                    </tr>
-                @empty
+        <!-- USER LIST TABLE -->
+        <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm mt-4">
+            <table class="w-full text-sm text-left">
+                <thead class="bg-gray-50 text-gray-700 font-semibold border-b">
                     <tr>
-                        <td colspan="6" class="px-4 py-6 text-center text-gray-500">
-                            Tidak ada data logbook
-                        </td>
+                        <th class="px-6 py-4">Nama Peserta</th>
+                        <th class="px-6 py-4 text-center">Total Logbook</th>
+                        <th class="px-6 py-4 text-center">Logbook Pending</th>
+                        <th class="px-6 py-4 text-center">Aksi</th>
                     </tr>
-                @endforelse
-            </tbody>
-        </table>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @forelse($users as $user)
+                        <tr class="hover:bg-blue-50 transition duration-150">
+                            <td class="px-6 py-4 font-medium text-gray-900">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs uppercase">
+                                        {{ substr($user->name, 0, 2) }}
+                                    </div>
+                                    {{ $user->name }}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="bg-gray-100 text-gray-700 py-1 px-3 rounded-full text-xs font-bold">
+                                    {{ $user->total_logbooks }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                @if($user->pending_logbooks > 0)
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-700">
+                                        {{ $user->pending_logbooks }} Pending
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">
+                                        <i class="bi bi-check-circle-fill"></i> Semua Disetujui
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 text-center">
+                                <a href="{{ route('admin.logbooks.index', ['user_id' => $user->id]) }}"
+                                   class="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition">
+                                    <i class="bi bi-eye"></i> Detail Logbook
+                                </a>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="px-6 py-12 text-center text-gray-500">
+                                <div class="flex flex-col items-center justify-center">
+                                    <i class="bi bi-journal-x text-4xl mb-3 text-gray-300"></i>
+                                    <p>Tidak ada data peserta ditemukan.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
 
         <!-- PAGINATION -->
-        <div class="mt-6">
-            {{ $logbooks->links() }}
+        <div class="mt-4">
+            {{ $users->withQueryString()->links() }}
         </div>
     </div>
-</div>
-
 @endsection

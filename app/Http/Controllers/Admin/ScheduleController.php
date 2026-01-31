@@ -6,24 +6,124 @@ use App\Http\Controllers\Controller;
 use App\Models\Schedule;
 use App\Models\User;
 use App\Models\Location;
+use App\Models\Group;
+
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
 class ScheduleController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $schedules = Schedule::with(['user.group', 'location'])
-            ->latest('date')
-            ->paginate(15);
+        // View Detail Per Group (if group_id is present)
+        if ($request->filled('group_id') && is_numeric($request->group_id)) {
+            $group = Group::findOrFail($request->group_id);
 
-        return view('admin.schedules.index', compact('schedules'));
+            $query = Schedule::whereHas('user', function ($q) use ($group) {
+                $q->where('group_id', $group->id);
+            })->with(['user', 'locations'])->latest('date');
+
+            // Filter by specific user
+            if ($request->filled('user_id')) {
+                $query->where('user_id', $request->user_id);
+            }
+
+            // Filter by Date
+            if ($request->filled('start_date') && $request->filled('end_date')) {
+                $query->whereBetween('date', [$request->start_date, $request->end_date]);
+            }
+
+            $schedules = $query->paginate(20);
+            $usersInGroup = $group->users; // For dropdown filter
+
+            return view('admin.schedules.detail', compact('schedules', 'group', 'usersInGroup'));
+        }
+
+        // View Summary List (List all Groups)
+        $query = Group::query();
+
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        $groups = $query->withCount('users')->paginate(15);
+
+        return view('admin.schedules.index', compact('groups'));
     }
+
+    public function print(Request $request)
+    {
+        $validated = $request->validate([
+            'group_id' => ['required', 'exists:groups,id'],
+            'start_date' => ['required', 'date'],
+            'end_date' => ['required', 'date', 'after_or_equal:start_date'],
+        ]);
+
+        $group = Group::findOrFail($validated['group_id']);
+        $startDate = Carbon::parse($validated['start_date']);
+        $endDate = Carbon::parse($validated['end_date']);
+
+        $schedules = Schedule::with(['user', 'locations'])
+            ->whereHas('user', function ($q) use ($group) {
+                $q->where('group_id', $group->id);
+            })
+            ->whereBetween('date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+            ->orderBy('user_id')
+            ->orderBy('date')
+            ->get();
+
+        $data = [];
+        $groupedByUser = $schedules->groupBy('user_id');
+
+        foreach ($groupedByUser as $userId => $userSchedules) {
+            $user = $userSchedules->first()->user;
+            $userRows = [];
+
+            $currentRange = null;
+
+            foreach ($userSchedules as $schedule) {
+                // Combine location names
+                $locationNames = $schedule->locations->pluck('name')->implode(', ');
+
+                if (!$currentRange) {
+                    $currentRange = [
+                        'start' => $schedule->date,
+                        'end' => $schedule->date,
+                        'location' => $locationNames
+                    ];
+                    continue;
+                }
+
+                if ($currentRange['location'] === $locationNames) {
+                    $currentRange['end'] = $schedule->date;
+                } else {
+                    $userRows[] = $currentRange;
+                    $currentRange = [
+                        'start' => $schedule->date,
+                        'end' => $schedule->date,
+                        'location' => $locationNames
+                    ];
+                }
+            }
+            if ($currentRange) {
+                $userRows[] = $currentRange;
+            }
+
+            $data[] = [
+                'user' => $user,
+                'rows' => $userRows
+            ];
+        }
+
+        return view('admin.schedules.print', compact('data', 'group', 'startDate', 'endDate'));
+    }
+
 
     public function create()
     {
         $mahasiswa = User::where('role', 'mahasiswa')->with('group')->get();
-        $locations = Location::where('is_active', true)->get();
+        // Load locations grouped by division for easier selection, or just all active
+        $locations = Location::where('is_active', true)->with('division')->get();
 
         return view('admin.schedules.create', compact('mahasiswa', 'locations'));
     }
@@ -32,7 +132,8 @@ class ScheduleController extends Controller
     {
         $validated = $request->validate([
             'user_id' => ['required', 'exists:users,id'],
-            'location_id' => ['required', 'exists:locations,id'],
+            'location_ids' => ['required', 'array', 'min:1', 'max:3'], // 1 to 3 locations
+            'location_ids.*' => ['exists:locations,id'],
             'start_date' => ['required', 'date'],
             'end_date' => ['required', 'date', 'after_or_equal:start_date'],
             'notes' => ['nullable', 'string'],
@@ -41,46 +142,43 @@ class ScheduleController extends Controller
         $user = User::findOrFail($validated['user_id']);
         $startDate = Carbon::parse($validated['start_date']);
         $endDate = Carbon::parse($validated['end_date']);
-        
+
         $createdSchedules = [];
         $skippedDates = [];
-        $conflictDates = [];
 
-        // Generate jadwal untuk setiap hari kerja dalam range
+        // Note: Conflict checking with other groups for specific locations is more complex now with many-to-many.
+        // For simplicity in this step, we'll create the schedules first. 
+        // A strict conflict check would require checking if ANY of the selected locations are occupied.
+
         $currentDate = $startDate->copy();
         while ($currentDate <= $endDate) {
-            $dayOfWeek = $currentDate->dayOfWeek; // 0 = Minggu, 1 = Senin, ..., 6 = Sabtu
-            
-            // Skip Sabtu (6) dan Minggu (0)
+            $dayOfWeek = $currentDate->dayOfWeek;
+
             if ($dayOfWeek == 0 || $dayOfWeek == 6) {
                 $currentDate->addDay();
                 continue;
             }
 
-            // Tentukan waktu berdasarkan hari
-            if ($dayOfWeek == 5) { // Jumat
+            if ($dayOfWeek == 5) {
                 $startTime = '07:30';
                 $endTime = '14:30';
-            } else { // Senin-Kamis (1-4)
+            } else {
                 $startTime = '08:00';
                 $endTime = '15:30';
             }
 
-            // Validasi: Cek apakah sudah ada kelompok lain di lokasi yang sama pada tanggal yang sama
-            if ($user->group_id) {
-                $conflictingSchedule = Schedule::where('location_id', $validated['location_id'])
-                    ->where('date', $currentDate->format('Y-m-d'))
-                    ->whereHas('user', function ($query) use ($user) {
-                        $query->where('group_id', '!=', $user->group_id)
-                              ->whereNotNull('group_id');
-                    })
-                    ->first();
+            // Validasi Conflict: Cek lokasi
+            $conflicts = $this->checkConflicts($currentDate->format('Y-m-d'), $startTime, $endTime, $validated['location_ids']);
+            if ($conflicts->isNotEmpty()) {
+                // Ambil info detail conflict pertama
+                $conflict = $conflicts->first();
+                // Find which location caused the conflict
+                $conflictingLocationIds = $conflict->locations->pluck('id')->intersect($validated['location_ids']);
+                $locationName = Location::whereIn('id', $conflictingLocationIds)->pluck('name')->implode(', ');
 
-                if ($conflictingSchedule) {
-                    $conflictDates[] = $currentDate->format('d/m/Y');
-                    $currentDate->addDay();
-                    continue;
-                }
+                $skippedDates[] = $currentDate->format('d/m/Y') . " (Lokasi $locationName digunakan oleh " . ($conflict->user->name ?? 'Mahasiswa') . ")";
+                $currentDate->addDay();
+                continue;
             }
 
             // Cek apakah jadwal sudah ada untuk user ini di tanggal yang sama
@@ -94,15 +192,15 @@ class ScheduleController extends Controller
                 continue;
             }
 
-            // Buat jadwal
             $schedule = Schedule::create([
                 'user_id' => $validated['user_id'],
-                'location_id' => $validated['location_id'],
                 'date' => $currentDate->format('Y-m-d'),
                 'start_time' => $startTime,
                 'end_time' => $endTime,
                 'notes' => $validated['notes'] ?? null,
             ]);
+
+            $schedule->locations()->attach($validated['location_ids']);
 
             $createdSchedules[] = $schedule;
             $currentDate->addDay();
@@ -110,20 +208,16 @@ class ScheduleController extends Controller
 
         // Buat pesan sukses dengan informasi detail
         $message = "Jadwal berhasil dibuat untuk " . count($createdSchedules) . " hari kerja.";
-        
+
         if (!empty($skippedDates)) {
-            $message .= " " . count($skippedDates) . " tanggal dilewati (sudah ada jadwal): " . implode(', ', $skippedDates) . ".";
-        }
-        
-        if (!empty($conflictDates)) {
-            $message .= " " . count($conflictDates) . " tanggal konflik dengan kelompok lain: " . implode(', ', $conflictDates) . ".";
+            $message .= " " . count($skippedDates) . " tanggal dilewati: " . implode(', ', $skippedDates) . ".";
         }
 
         if (empty($createdSchedules)) {
             return back()
                 ->withInput()
                 ->withErrors([
-                    'start_date' => 'Tidak ada jadwal yang bisa dibuat. Semua tanggal sudah terisi atau konflik dengan kelompok lain.'
+                    'start_date' => 'Tidak ada jadwal yang bisa dibuat karena semua tanggal sudah terisi atau konflik.'
                 ]);
         }
 
@@ -134,7 +228,8 @@ class ScheduleController extends Controller
     public function edit(Schedule $schedule)
     {
         $mahasiswa = User::where('role', 'mahasiswa')->with('group')->get();
-        $locations = Location::where('is_active', true)->get();
+        $locations = Location::where('is_active', true)->with('division')->get();
+        $schedule->load('locations'); // Load pivot data
 
         return view('admin.schedules.edit', compact('schedule', 'mahasiswa', 'locations'));
     }
@@ -143,37 +238,45 @@ class ScheduleController extends Controller
     {
         $validated = $request->validate([
             'user_id' => ['required', 'exists:users,id'],
-            'location_id' => ['required', 'exists:locations,id'],
+            'location_ids' => ['required', 'array', 'min:1', 'max:3'],
+            'location_ids.*' => ['exists:locations,id'],
             'date' => ['required', 'date'],
             'start_time' => ['required'],
             'end_time' => ['required', 'after:start_time'],
             'notes' => ['nullable', 'string'],
         ]);
 
-        // Validasi: Cek apakah sudah ada kelompok lain di lokasi yang sama pada tanggal yang sama
-        $user = User::findOrFail($validated['user_id']);
-        
-        if ($user->group_id) {
-            $conflictingSchedule = Schedule::where('location_id', $validated['location_id'])
-                ->where('date', $validated['date'])
-                ->where('id', '!=', $schedule->id) // Exclude current schedule
-                ->whereHas('user', function ($query) use ($user) {
-                    $query->where('group_id', '!=', $user->group_id)
-                          ->whereNotNull('group_id');
-                })
-                ->first();
+        // Validation Conflict for Update
+        $conflicts = $this->checkConflicts(
+            $validated['date'],
+            $validated['start_time'],
+            $validated['end_time'],
+            $validated['location_ids'],
+            $schedule->id
+        );
 
-            if ($conflictingSchedule) {
-                $conflictingGroup = $conflictingSchedule->user->group;
-                return back()
-                    ->withInput()
-                    ->withErrors([
-                        'location_id' => "Lokasi ini sudah ditempati oleh {$conflictingGroup->name} pada tanggal yang sama. Silakan pilih lokasi atau tanggal lain."
-                    ]);
-            }
+        if ($conflicts->isNotEmpty()) {
+            $conflict = $conflicts->first();
+            $conflictingLocationIds = $conflict->locations->pluck('id')->intersect($validated['location_ids']);
+            $locationName = Location::whereIn('id', $conflictingLocationIds)->pluck('name')->implode(', ');
+
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'location_ids' => "Lokasi $locationName sudah digunakan oleh " . ($conflict->user->name ?? 'lain') . " pada tanggal dan waktu tersebut."
+                ]);
         }
 
-        $schedule->update($validated);
+        $schedule->update([
+
+            'user_id' => $validated['user_id'],
+            'date' => $validated['date'],
+            'start_time' => $validated['start_time'],
+            'end_time' => $validated['end_time'],
+            'notes' => $validated['notes'] ?? null,
+        ]);
+
+        $schedule->locations()->sync($validated['location_ids']);
 
         return redirect()->route('admin.schedules.index')
             ->with('success', 'Jadwal berhasil diperbarui.');
@@ -186,5 +289,35 @@ class ScheduleController extends Controller
         return redirect()->route('admin.schedules.index')
             ->with('success', 'Jadwal berhasil dihapus.');
     }
-}
 
+    public function bulkDestroy(Request $request)
+    {
+        $validated = $request->validate([
+            'ids' => ['required', 'array'],
+            'ids.*' => ['exists:schedules,id'],
+        ]);
+
+        Schedule::whereIn('id', $validated['ids'])->delete();
+
+        return redirect()->route('admin.schedules.index')
+            ->with('success', count($validated['ids']) . ' Jadwal berhasil dihapus.');
+    }
+
+
+    private function checkConflicts($date, $startTime, $endTime, $locationIds, $excludeId = null)
+    {
+        return Schedule::where('date', $date)
+            ->where(function ($q) use ($startTime, $endTime) {
+                $q->where('start_time', '<', $endTime)
+                    ->where('end_time', '>', $startTime);
+            })
+            ->whereHas('locations', function ($q) use ($locationIds) {
+                $q->whereIn('locations.id', $locationIds);
+            })
+            ->when($excludeId, function ($q) use ($excludeId) {
+                $q->where('id', '!=', $excludeId);
+            })
+            ->with(['locations', 'user'])
+            ->get();
+    }
+}

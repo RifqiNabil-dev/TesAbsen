@@ -11,20 +11,38 @@ class AttendanceController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Attendance::with(['user', 'location']);
-
+        // View Detail Per User (if user_id is present)
         if ($request->filled('user_id')) {
-            $query->where('user_id', $request->user_id);
+            $query = Attendance::where('user_id', $request->user_id)
+                ->with(['user', 'location']);
+
+            if ($request->filled('date')) {
+                $query->whereDate('date', $request->date);
+            }
+
+            $attendances = $query->latest('date')->paginate(15);
+            $selectedUser = User::find($request->user_id);
+
+            return view('admin.attendance.detail', compact('attendances', 'selectedUser'));
         }
 
-        if ($request->filled('date')) {
-            $query->whereDate('date', $request->date);
+        // View Summary List (Group by User) - Default
+        // Logic: Get Users with role mahasiswa and count their stats
+        // To be simpler, we just pass the users list, and stats can be calculated or just simple list
+        $query = User::where('role', 'mahasiswa');
+
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
         }
 
-        $attendances = $query->latest('date')->paginate(15);
-        $mahasiswa = User::where('role', 'mahasiswa')->get();
+        $users = $query->withCount([
+            'attendances as total_attendances',
+            'attendances as today_attendance' => function ($q) {
+                $q->whereDate('date', today());
+            }
+        ])->paginate(15);
 
-        return view('admin.attendance.index', compact('attendances', 'mahasiswa'));
+        return view('admin.attendance.index', compact('users'));
     }
 
     public function show(Attendance $attendance)
@@ -33,6 +51,6 @@ class AttendanceController extends Controller
         return view('admin.attendance.show', compact('attendance'));
     }
 
-    
+
 }
 

@@ -10,19 +10,39 @@ class LogbookController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Logbook::with('user');
-
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
+        // View Detail Per User (if user_id is present)
         if ($request->filled('user_id')) {
-            $query->where('user_id', $request->user_id);
+            $query = Logbook::with('user');
+
+            if ($request->filled('status')) {
+                $query->where('status', $request->status);
+            }
+
+            if ($request->filled('user_id')) {
+                $query->where('user_id', $request->user_id);
+            }
+
+            $logbooks = $query->latest('date')->paginate(15);
+            $selectedUser = \App\Models\User::find($request->user_id);
+
+            return view('admin.logbooks.detail', compact('logbooks', 'selectedUser'));
         }
 
-        $logbooks = $query->latest('date')->paginate(15);
+        // View Summary List (Group by User)
+        $query = \App\Models\User::where('role', 'mahasiswa');
 
-        return view('admin.logbooks.index', compact('logbooks'));
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        $users = $query->withCount([
+            'logbooks as total_logbooks',
+            'logbooks as pending_logbooks' => function ($q) {
+                $q->where('status', 'pending');
+            }
+        ])->paginate(15);
+
+        return view('admin.logbooks.index', compact('users'));
     }
 
     public function show(Logbook $logbook)

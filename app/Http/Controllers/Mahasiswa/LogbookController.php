@@ -28,13 +28,23 @@ class LogbookController extends Controller
             'date' => ['required', 'date'],
             'activity' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
-            'start_time' => ['required'],
-            'end_time' => ['required', 'after:start_time'],
         ]);
+
+        $user = auth()->user();
+
+        // Auto-fill time from schedule
+        $schedule = \App\Models\Schedule::where('user_id', $user->id)
+            ->whereDate('date', '=', $request->date)
+            ->first();
+
+        $startTime = $schedule ? $schedule->start_time : '08:00:00';
+        $endTime = $schedule ? $schedule->end_time : '17:00:00';
 
         Logbook::create([
             ...$validated,
-            'user_id' => auth()->id(),
+            'user_id' => $user->id,
+            'start_time' => $startTime,
+            'end_time' => $endTime,
             'status' => 'pending',
         ]);
 
@@ -81,11 +91,21 @@ class LogbookController extends Controller
             'date' => ['required', 'date'],
             'activity' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
-            'start_time' => ['required'],
-            'end_time' => ['required', 'after:start_time'],
         ]);
 
-        $logbook->update($validated);
+        // Auto-update time if date changes (or check schedule for that date)
+        $schedule = \App\Models\Schedule::where('user_id', auth()->id())
+            ->whereDate('date', '=', $request->date)
+            ->first();
+
+        $startTime = $schedule ? $schedule->start_time : '08:00:00';
+        $endTime = $schedule ? $schedule->end_time : '17:00:00';
+
+        $logbook->update([
+            ...$validated,
+            'start_time' => $startTime,
+            'end_time' => $endTime,
+        ]);
 
         return redirect()->route('mahasiswa.logbooks.index')
             ->with('success', 'Logbook berhasil diperbarui.');

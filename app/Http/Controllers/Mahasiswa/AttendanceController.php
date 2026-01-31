@@ -22,18 +22,18 @@ class AttendanceController extends Controller
 
     private function calculateDistance($lat1, $lon1, $lat2, $lon2)
     {
-    $earthRadius = 6371000; // meter
+        $earthRadius = 6371000; // meter
 
-    $dLat = deg2rad($lat2 - $lat1);
-    $dLon = deg2rad($lon2 - $lon1);
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLon = deg2rad($lon2 - $lon1);
 
-    $a = sin($dLat / 2) * sin($dLat / 2) +
-         cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
-         sin($dLon / 2) * sin($dLon / 2);
+        $a = sin($dLat / 2) * sin($dLat / 2) +
+            cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+            sin($dLon / 2) * sin($dLon / 2);
 
-    $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
 
-    return round($earthRadius * $c, 2); // meter
+        return round($earthRadius * $c, 2); // meter
     }
 
 
@@ -59,33 +59,61 @@ class AttendanceController extends Controller
         // Ambil jadwal hari ini
         $schedule = Schedule::where('user_id', $user->id)
             ->whereDate('date', $today)
-            ->with('location')
+            ->with('locations')
             ->first();
 
-        if (!$schedule || !$schedule->location) {
-            return back()->with('error', 'Lokasi magang belum ditentukan.');
+        if (!$schedule || $schedule->locations->isEmpty()) {
+            return back()->with('error', 'Lokasi magang belum ditentukan untuk jadwal hari ini.');
         }
 
-        $location = $schedule->location;
+        // Cari lokasi terdekat / yang validd
+        $nearestLocation = null;
+        $minDistance = INF;
+        $validLocation = null;
 
-        // Hitung jarak
-        $distance = $this->calculateDistance(
-            $request->latitude,
-            $request->longitude,
-            $location->latitude,
-            $location->longitude
-        );
+        foreach ($schedule->locations as $loc) {
+            $dist = $this->calculateDistance(
+                $request->latitude,
+                $request->longitude,
+                $loc->latitude ?? 0, // Fallback if lat is null
+                $loc->longitude ?? 0
+            );
+
+            // Jika masuk radius, prioritas pilih ini
+            if ($dist <= ($loc->radius ?? 100)) {
+                $validLocation = $loc;
+                $minDistance = $dist;
+                break; // Found a valid location, stop searching
+            }
+
+            // Keep track of nearest just in case
+            if ($dist < $minDistance) {
+                $minDistance = $dist;
+                $nearestLocation = $loc;
+            }
+        }
+
+        // Determine which location to use for the record
+        $targetLocation = $validLocation ?? $nearestLocation;
+        $distance = $minDistance;
+
+        // Safety check if something went wrong and we still don't have a location
+        if (!$targetLocation) {
+            return back()->with('error', 'Data lokasi tidak valid.');
+        }
 
         // Tentukan status lokasi
-        $locationStatus = $distance <= $location->radius
+        $radius = $targetLocation->radius ?? 100;
+        $locationStatus = $distance <= $radius
             ? 'berada dilokasi magang'
             : 'diluar lokasi magang';
 
-        // Status kehadiran (jam)
+        // Check Late Status (Tolerance 15 minutes)
         $checkInTime = now();
-        $status = $checkInTime->format('H:i') > '08:00'
-            ? 'terlambat'
-            : 'hadir';
+        $scheduleStartTime = Carbon::parse($schedule->start_time); // From schedule
+        $lateThreshold = $scheduleStartTime->copy()->addMinutes(15);
+
+        $status = $checkInTime->gt($lateThreshold) ? 'terlambat' : 'hadir';
 
         Attendance::updateOrCreate(
             [
@@ -95,7 +123,7 @@ class AttendanceController extends Controller
             [
                 'check_in' => $checkInTime,
                 'status' => $status,
-                'location_id' => $location->id,
+                'location_id' => $targetLocation->id,
                 'latitude' => $request->latitude,
                 'longitude' => $request->longitude,
                 'distance' => $distance,
@@ -103,9 +131,11 @@ class AttendanceController extends Controller
             ]
         );
 
+        $message = "Absen berhasil di {$targetLocation->name}. Anda $locationStatus (jarak $distance meter).";
+
         return back()->with(
             $locationStatus === 'berada dilokasi magang' ? 'success' : 'warning',
-            "Absen berhasil. Anda $locationStatus (jarak $distance meter)."
+            $message
         );
     }
 
