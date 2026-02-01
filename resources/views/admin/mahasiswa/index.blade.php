@@ -20,10 +20,10 @@
             <input type="text" x-model="search" placeholder="Cari nama / email..."
                 class="w-full md:w-1/3 rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200 focus:outline-none">
 
-            <!-- Filter Institusi -->
+            <!-- Filter Kelompok -->
             <select x-model="institution"
                 class="w-full md:w-1/4 rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200 focus:outline-none">
-                <option value="">Semua Institusi</option>
+                <option value="">Semua Kelompok</option>
                 @foreach($mahasiswa->pluck('institution')->unique() as $inst)
                     @if($inst)
                         <option value="{{ strtolower($inst) }}">{{ $inst }}</option>
@@ -49,7 +49,7 @@
                         <th class="px-4 py-3">Nama</th>
                         <th class="px-4 py-3">Email</th>
                         <th class="px-4 py-3">NIM</th>
-                        <th class="px-4 py-3">Institusi</th>
+                        <th class="px-4 py-3">Kelompok</th>
                         <th class="px-4 py-3">Periode</th>
                         <th class="px-4 py-3 text-center">Aksi</th>
                     </tr>

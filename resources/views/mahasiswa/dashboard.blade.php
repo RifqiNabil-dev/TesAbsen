@@ -12,28 +12,43 @@
     </div>
 
     <!-- Statistik -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-        <div class="bg-blue-500 text-white rounded-lg shadow">
-            <div class="p-4 sm:p-5">
-                <h5 class="text-xs sm:text-sm font-semibold tracking-wide">Total Presensi</h5>
-                <h2 class="text-2xl sm:text-3xl font-bold">{{ $totalAttendance }}</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div
+            class="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] hover:-translate-y-1 transition-transform duration-300">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h5 class="text-xs sm:text-sm font-semibold tracking-wider opacity-90 uppercase">Total Presensi</h5>
+                    <i class="bi bi-calendar-check text-2xl opacity-80"></i>
+                </div>
+                <h2 class="text-3xl font-bold">{{ $totalAttendance }}</h2>
+                <p class="text-xs mt-2 opacity-75">Hari hadir</p>
             </div>
         </div>
 
-        <div class="bg-green-500 text-white rounded-lg shadow">
-            <div class="p-4 sm:p-5">
-                <h5 class="text-xs sm:text-sm font-semibold tracking-wide">Logbook Disetujui</h5>
-                <h2 class="text-2xl sm:text-3xl font-bold">{{ $totalLogbooks }}</h2>
+        <div
+            class="bg-gradient-to-br from-emerald-500 to-emerald-600 text-white rounded-xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] hover:-translate-y-1 transition-transform duration-300">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h5 class="text-xs sm:text-sm font-semibold tracking-wider opacity-90 uppercase">Logbook Disetujui</h5>
+                    <i class="bi bi-journal-check text-2xl opacity-80"></i>
+                </div>
+                <h2 class="text-3xl font-bold">{{ $totalLogbooks }}</h2>
+                <p class="text-xs mt-2 opacity-75">Aktivitas tervalidasi</p>
             </div>
         </div>
 
-        <div class="bg-cyan-500 text-white rounded-lg shadow">
-            <div class="p-4 sm:p-5">
-                <h5 class="text-xs sm:text-sm font-semibold tracking-wide">Jadwal Hari Ini</h5>
-                <h4 class="text-lg sm:text-xl font-semibold">
-                    {{ $todaySchedule ? $todaySchedule->locations->pluck('name')->implode(', ') : '-' }}
+        <div
+            class="bg-gradient-to-br from-cyan-500 to-cyan-600 text-white rounded-xl shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] hover:-translate-y-1 transition-transform duration-300">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h5 class="text-xs sm:text-sm font-semibold tracking-wider opacity-90 uppercase">Jadwal Hari Ini</h5>
+                    <i class="bi bi-geo-alt text-2xl opacity-80"></i>
+                </div>
+                <h4 class="text-lg font-semibold truncate"
+                    title="{{ $todaySchedule ? $todaySchedule->locations->pluck('name')->implode(', ') : '-' }}">
+                    {{ $todaySchedule ? $todaySchedule->locations->pluck('name')->implode(', ') : 'Libur / Tidak Ada Jadwal' }}
                 </h4>
-
+                <p class="text-xs mt-2 opacity-75">Lokasi penempatan</p>
             </div>
         </div>
     </div>
@@ -72,7 +87,7 @@
                                     @csrf
                                     <button type="submit"
                                         class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg shadow-sm
-                                                                                                                       text-base sm:text-lg flex items-center gap-2 transition-all">
+                                                                                                                                       text-base sm:text-lg flex items-center gap-2 transition-all">
                                         <i class="bi bi-box-arrow-right"></i> Absen Pulang
                                     </button>
                                 </form>
@@ -115,7 +130,7 @@
                             {{-- Absen Masuk --}}
                             <button type="button" onclick="openAttendancePreview()"
                                 class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg shadow-sm
-                                                                                           text-base sm:text-lg flex items-center gap-2 transition-all">
+                                                                                                       text-base sm:text-lg flex items-center gap-2 transition-all">
                                 <i class="bi bi-geo-alt-fill"></i> Absen Masuk
                             </button>
                         @endif

@@ -46,15 +46,27 @@
                 ><?php echo e(old('description', $location->description)); ?></textarea>
             </div>
 
+            <!-- Search Box (New Feature) -->
+            <div class="mb-2 relative z-[1000]">
+                <div class="flex gap-2">
+                    <input type="text" id="searchLocation" placeholder="Cari nama lokasi (misal: Perpustakaan)" 
+                        class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200 focus:border-blue-500">
+                    <button type="button" id="btnSearch" class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">
+                        Cari
+                    </button>
+                </div>
+                <ul id="searchResults" class="hidden absolute left-0 right-0 bg-white border border-gray-200 mt-1 max-h-48 overflow-y-auto z-50 rounded shadow-lg"></ul>
+            </div>
+
             <!-- MAP -->
             <div class="mb-4">
                 <label class="block text-sm font-semibold text-gray-700 mb-2">
                     Pilih Titik Lokasi Magang <span class="text-red-500">*</span>
                 </label>
 
-                <div id="map" class="w-full h-72 rounded border"></div>
+                <div id="map" class="w-full h-72 rounded border relative z-0"></div>
                 <p class="text-xs text-gray-500 mt-1">
-                    Klik pada peta untuk menentukan titik lokasi absensi
+                    Klik pada peta atau gunakan pencarian untuk menentukan titik lokasi absensi
                 </p>
             </div>
 
@@ -172,9 +184,11 @@
                     color: 'blue',
                     fillOpacity: 0.2
                 }).addTo(map);
+                
+                map.setView([lat, lng], 16);
             }
 
-            // default marker
+            // default marker initialization
             updateMap(defaultLat, defaultLng, defaultRadius);
             document.getElementById('latitude').value = defaultLat.toFixed(7);
             document.getElementById('longitude').value = defaultLng.toFixed(7);
@@ -197,6 +211,68 @@
 
                 if (lat && lng) {
                     updateMap(lat, lng, this.value);
+                }
+            });
+
+            // --- SEARCH FEATURE ---
+            const btnSearch = document.getElementById('btnSearch');
+            const searchInput = document.getElementById('searchLocation');
+            const searchResults = document.getElementById('searchResults');
+
+            btnSearch.addEventListener('click', function() {
+                const query = searchInput.value;
+                if (!query) return;
+
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        searchResults.innerHTML = '';
+                        searchResults.classList.remove('hidden');
+
+                        if (data.length === 0) {
+                            const li = document.createElement('li');
+                            li.className = 'px-3 py-2 text-sm text-gray-500';
+                            li.textContent = 'Lokasi tidak ditemukan';
+                            searchResults.appendChild(li);
+                            return;
+                        }
+
+                        data.forEach(place => {
+                            const li = document.createElement('li');
+                            li.className = 'px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer border-b last:border-0';
+                            li.textContent = place.display_name;
+                            li.onclick = function() {
+                                const lat = parseFloat(place.lat);
+                                const lon = parseFloat(place.lon);
+                                const radius = document.getElementById('radius').value;
+
+                                document.getElementById('latitude').value = lat.toFixed(7);
+                                document.getElementById('longitude').value = lon.toFixed(7);
+                                
+                                updateMap(lat, lon, radius);
+                                searchResults.classList.add('hidden');
+                            };
+                            searchResults.appendChild(li);
+                        });
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        alert('Gagal mencari lokasi. Silakan coba lagi.');
+                    });
+            });
+            
+            // Allow Enter key to search
+             searchInput.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    btnSearch.click();
+                }
+            });
+
+            // Close results when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!searchResults.contains(e.target) && e.target !== searchInput && e.target !== btnSearch) {
+                    searchResults.classList.add('hidden');
                 }
             });
         </script>

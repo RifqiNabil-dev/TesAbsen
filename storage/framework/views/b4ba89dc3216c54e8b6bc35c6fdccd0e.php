@@ -18,7 +18,7 @@
             <div class="relative">
                 <input type="text" name="search" value="<?php echo e(request('search')); ?>" 
                        placeholder="Cari nama peserta..."
-                       class="w-full md:w-1/3 rounded-lg border border-gray-300 px-4 py-2 pl-10 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                       class="w-full md:w-1/3 rounded-lg border border-gray-300 pr-4 py-2 pl-12 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
                 <i class="bi bi-search absolute left-3 top-2.5 text-gray-400"></i>
             </div>
         </form>

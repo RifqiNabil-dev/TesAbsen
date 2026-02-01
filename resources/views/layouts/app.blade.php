@@ -90,7 +90,7 @@
                                     class="hover:text-blue-600 transition {{ request()->routeIs('mahasiswa.schedules.*') ? 'text-blue-600' : '' }}">Jadwal</a>
                             </li>
                             <li><a href="{{ route('mahasiswa.locations.index') }}"
-                                    class="hover:text-blue-600 transition {{ request()->routeIs('mahasiswa.locations.*') ? 'text-blue-600' : '' }}">Info
+                                    class="hover:text-blue-600 transition {{ request()->routeIs('mahasiswa.locations.*') ? 'text-blue-600' : '' }}">Informasi
                                     Lokasi</a>
                             </li>
                         @endif
@@ -165,7 +165,7 @@
                             <a href="{{ route('mahasiswa.schedules.index') }}"
                                 class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">Jadwal</a>
                             <a href="{{ route('mahasiswa.locations.index') }}"
-                                class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">Info
+                                class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">Informasi
                                 Lokasi</a>
                         @endif
                     </div>

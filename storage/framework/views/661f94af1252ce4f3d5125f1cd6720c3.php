@@ -68,6 +68,11 @@
                     </div>
 
                     <div class="w-full rounded-2xl bg-gray-50 px-4 ring-2 ring-gray-200">
+                        <input type="tel" name="phone_number" required placeholder="Nomor HP"
+                            class="my-3 w-full bg-transparent outline-none">
+                    </div>
+
+                    <div class="w-full rounded-2xl bg-gray-50 px-4 ring-2 ring-gray-200">
                         <input type="password" name="password" required placeholder="Password"
                             class="my-3 w-full bg-transparent outline-none">
                     </div>

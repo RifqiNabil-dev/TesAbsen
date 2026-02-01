@@ -14,43 +14,55 @@
 
     <!-- SUMMARY CARDS -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div class="rounded-xl bg-white p-6 shadow-sm border border-gray-100 flex items-start justify-between">
+        <!-- Total Peserta -->
+        <div
+            class="rounded-xl bg-white p-6 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] border border-gray-100 flex items-start justify-between hover:shadow-lg transition-shadow duration-300">
             <div>
-                <p class="text-sm font-medium text-gray-500">Total Peserta</p>
-                <h2 class="text-3xl font-bold text-gray-900 mt-1"><?php echo e($totalMahasiswa); ?></h2>
+                <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Total Peserta</p>
+                <h2 class="text-3xl font-bold text-gray-900 mt-2"><?php echo e($totalMahasiswa); ?></h2>
+                <p class="text-xs text-gray-400 mt-1">Mahasiswa aktif</p>
             </div>
-            <div class="p-3 bg-blue-50 text-blue-600 rounded-lg">
-                <i class="bi bi-people-fill text-xl"></i>
+            <div class="p-4 bg-blue-50 text-blue-600 rounded-xl shadow-sm">
+                <i class="bi bi-people-fill text-2xl"></i>
             </div>
         </div>
 
-        <div class="rounded-xl bg-white p-6 shadow-sm border border-gray-100 flex items-start justify-between">
+        <!-- Lokasi Aktif -->
+        <div
+            class="rounded-xl bg-white p-6 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] border border-gray-100 flex items-start justify-between hover:shadow-lg transition-shadow duration-300">
             <div>
-                <p class="text-sm font-medium text-gray-500">Lokasi Aktif</p>
-                <h2 class="text-3xl font-bold text-gray-900 mt-1"><?php echo e($totalLocations); ?></h2>
+                <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Lokasi Aktif</p>
+                <h2 class="text-3xl font-bold text-gray-900 mt-2"><?php echo e($totalLocations); ?></h2>
+                <p class="text-xs text-gray-400 mt-1">Titik layanan</p>
             </div>
-            <div class="p-3 bg-green-50 text-green-600 rounded-lg">
-                <i class="bi bi-geo-alt-fill text-xl"></i>
+            <div class="p-4 bg-green-50 text-green-600 rounded-xl shadow-sm">
+                <i class="bi bi-geo-alt-fill text-2xl"></i>
             </div>
         </div>
 
-        <div class="rounded-xl bg-white p-6 shadow-sm border border-gray-100 flex items-start justify-between">
+        <!-- Presensi Hari Ini -->
+        <div
+            class="rounded-xl bg-white p-6 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] border border-gray-100 flex items-start justify-between hover:shadow-lg transition-shadow duration-300">
             <div>
-                <p class="text-sm font-medium text-gray-500">Presensi Hari Ini</p>
-                <h2 class="text-3xl font-bold text-gray-900 mt-1"><?php echo e($todayAttendances); ?></h2>
+                <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Presensi Hari Ini</p>
+                <h2 class="text-3xl font-bold text-gray-900 mt-2"><?php echo e($todayAttendances); ?></h2>
+                <p class="text-xs text-gray-400 mt-1">Check-in masuk</p>
             </div>
-            <div class="p-3 bg-sky-50 text-sky-600 rounded-lg">
-                <i class="bi bi-calendar-check-fill text-xl"></i>
+            <div class="p-4 bg-sky-50 text-sky-600 rounded-xl shadow-sm">
+                <i class="bi bi-calendar-check-fill text-2xl"></i>
             </div>
         </div>
 
-        <div class="rounded-xl bg-white p-6 shadow-sm border border-gray-100 flex items-start justify-between">
+        <!-- Logbook Pending -->
+        <div
+            class="rounded-xl bg-white p-6 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07),0_10px_20px_-2px_rgba(0,0,0,0.04)] border border-gray-100 flex items-start justify-between hover:shadow-lg transition-shadow duration-300">
             <div>
-                <p class="text-sm font-medium text-gray-500">Logbook Pending</p>
-                <h2 class="text-3xl font-bold text-gray-900 mt-1"><?php echo e($pendingLogbooks); ?></h2>
+                <p class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Logbook Pending</p>
+                <h2 class="text-3xl font-bold text-gray-900 mt-2"><?php echo e($pendingLogbooks); ?></h2>
+                <p class="text-xs text-gray-400 mt-1">Perlu review</p>
             </div>
-            <div class="p-3 bg-yellow-50 text-yellow-600 rounded-lg">
-                <i class="bi bi-journal-text text-xl"></i>
+            <div class="p-4 bg-yellow-50 text-yellow-600 rounded-xl shadow-sm">
+                <i class="bi bi-journal-text text-2xl"></i>
             </div>
         </div>
     </div>
