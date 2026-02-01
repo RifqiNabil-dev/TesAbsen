@@ -27,7 +27,7 @@
                             <th class="px-4 py-3 border-b">NIM</th>
                             <th class="px-4 py-3 border-b text-center">Total Presensi</th>
                             <th class="px-4 py-3 border-b text-center">Total Logbook</th>
-                            <th class="px-4 py-3 border-b">Penilaian Terakhir</th>
+                            <th class="px-4 py-3 border-b text-center">Penilaian Terakhir</th>
                             <th class="px-4 py-3 border-b text-center">Aksi</th>
                         </tr>
                     </thead>
@@ -56,7 +56,7 @@
                                     {{ $mhs->logbooks_count }}
                                 </td>
 
-                                <td class="px-4 py-3">
+                                <td class="px-4 py-3 text-center">
                                     @if($mhs->assessments->count() > 0)
                                         <span class="font-semibold text-gray-800">
                                             {{ $mhs->assessments->last()->grade }}
@@ -72,11 +72,21 @@
                                 </td>
 
                                 <td class="px-4 py-3 text-center">
-                                    <a href="{{ route('admin.reports.show', ['user' => $mhs->id]) }}"
-                                        class="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-blue-700 transition">
-                                        <i class="bi bi-eye"></i>
-                                        Detail
-                                    </a>
+                                    @if($mhs->assessments->count() > 0)
+                                        <a href="{{ route('admin.reports.edit', $mhs->id) }}"
+                                            class="inline-flex items-center gap-1.5 rounded-lg bg-yellow-500 px-3 py-1.5
+                                                text-xs font-medium text-white shadow-sm hover:bg-yellow-600 transition">
+                                            <i class="bi bi-pencil-square"></i>
+                                            Edit
+                                        </a>
+                                    @else
+                                        <a href="{{ route('admin.reports.show', $mhs->id) }}"
+                                            class="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5
+                                                text-xs font-medium text-white shadow-sm hover:bg-blue-700 transition">
+                                            <i class="bi bi-eye"></i>
+                                            Nilai
+                                        </a>
+                                    @endif
                                 </td>
                             </tr>
                         @empty

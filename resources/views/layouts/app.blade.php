@@ -13,11 +13,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    {{--
-    @stack('scripts') --}}
     @stack('styles')
 </head>
 
@@ -75,6 +73,9 @@
                             </li>
                             <li><a href="{{ route('admin.reports.index') }}"
                                     class="hover:text-blue-600 transition {{ request()->routeIs('admin.reports.*') ? 'text-blue-600' : '' }}">Laporan</a>
+                            </li>
+                            <li><a href="{{ route('admin.users.index') }}"
+                                    class="hover:text-blue-600 transition {{ request()->routeIs('admin.users.index') ? 'text-blue-600' : '' }}">Users</a>
                             </li>
                         @else
                             <li><a href="{{ route('mahasiswa.dashboard') }}"

@@ -21,7 +21,7 @@ class ReportController extends Controller
 
     public function show(User $user)
     {
-        $user->load(['attendances', 'logbooks', 'schedules.location', 'assessments.assessor']);
+        $user->load(['attendances', 'logbooks', 'schedules.locations', 'assessments.assessor']);
         
         $totalAttendance = $user->attendances()->where('status', 'hadir')->count();
         $totalLate = $user->attendances()->where('status', 'terlambat')->count();
@@ -59,8 +59,63 @@ class ReportController extends Controller
             'assessed_by' => auth()->id(),
         ]);
 
-        return redirect()->route('admin.reports.show', $user)
-            ->with('success', 'Penilaian berhasil disimpan.');
+        return redirect()
+            ->route('admin.reports.show', $user)
+            ->with('alert', 'assessment_saved');
+
+    }
+    public function edit(User $user)
+    {
+        $latestAssessment = $user->assessments()->latest()->first();
+
+        if (!$latestAssessment) {
+            return redirect()
+                ->route('admin.reports.show', $user)
+                ->with('error', 'Penilaian belum tersedia.');
+        }
+
+        // Ambil statistik
+        $totalAttendance = $user->attendances()->where('status', 'hadir')->count();
+        $totalLate       = $user->attendances()->where('status', 'terlambat')->count();
+        $totalAbsent     = $user->attendances()->where('status', 'tidak_hadir')->count();
+        $totalLogbooks   = $user->logbooks()->where('status', 'approved')->count();
+
+        return view('admin.reports.edit', compact(
+            'user',
+            'latestAssessment',
+            'totalAttendance',
+            'totalLate',
+            'totalAbsent',
+            'totalLogbooks'
+        ));
+    }
+
+    public function update(Request $request, User $user)
+    {
+        $assessment = $user->assessments()->latest()->first();
+
+        if (!$assessment) {
+            return redirect()
+                ->route('admin.reports.show', $user)
+                ->with('error', 'Penilaian tidak ditemukan.');
+        }
+
+        $validated = $request->validate([
+            'attendance_score' => ['required', 'integer', 'min:0', 'max:20'],
+            'discipline_score' => ['required', 'integer', 'min:0', 'max:20'],
+            'performance_score' => ['required', 'integer', 'min:0', 'max:20'],
+            'initiative_score' => ['required', 'integer', 'min:0', 'max:20'],
+            'cooperation_score' => ['required', 'integer', 'min:0', 'max:20'],
+            'strengths' => ['nullable', 'string'],
+            'weaknesses' => ['nullable', 'string'],
+            'recommendations' => ['nullable', 'string'],
+        ]);
+
+        $assessment->update($validated);
+
+        return redirect()
+            ->route('admin.reports.edit', $user)
+            ->with('alert', 'assessment_updated');
     }
 }
 

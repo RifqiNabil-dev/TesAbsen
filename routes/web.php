@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\MahasiswaController;
 use App\Http\Controllers\Admin\ScheduleController;
 use App\Http\Controllers\Admin\LocationController;
@@ -30,6 +31,8 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('dashboard');
 
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::resource('users', UserController::class)->only(['index', 'edit', 'update', 'destroy']);
     Route::resource('mahasiswa', MahasiswaController::class);
     Route::get('schedules/print', [ScheduleController::class, 'print'])->name('schedules.print');
     Route::delete('schedules/bulk-destroy', [ScheduleController::class, 'bulkDestroy'])->name('schedules.bulk-destroy');
@@ -50,6 +53,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/reports/{user}', [ReportController::class, 'show'])->name('reports.show');
     Route::post('/reports/{user}/assessment', [ReportController::class, 'storeAssessment'])->name('reports.assessment');
+    Route::get('/reports/{user}/edit', [ReportController::class, 'edit'])->name('reports.edit');
+    Route::put('/reports/{user}', [ReportController::class, 'update'])->name('reports.update');
+
 });
 
 // Mahasiswa Routes

@@ -20,7 +20,7 @@
             <!-- MAHASISWA SEARCH -->
             <div x-data="{ search: '' }" class="mb-4">
                 <label class="block text-sm font-semibold mb-1">
-                    Mahasiswa <span class="text-red-500">*</span>
+                    Peserta <span class="text-red-500">*</span>
                 </label>
 
                 <!-- SEARCH BAR -->
@@ -87,21 +87,54 @@ unset($__errorArgs, $__bag); ?>
             <!-- LOKASI -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
-                    Lokasi <span class="text-red-500">*</span>
+                    Lokasi (Pilih 1-3) <span class="text-red-500">*</span>
                 </label>
-                <select
-                    name="location_id"
-                    required
-                    class="w-full rounded border border-gray-900 px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                    <option value="">Pilih Lokasi</option>
-                    <?php $__currentLoopData = $locations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $location): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <option value="<?php echo e($location->id); ?>" <?php echo e(old('location_id') == $location->id ? 'selected' : ''); ?>>
-                            <?php echo e($location->name); ?>
+                
+                <div class="border rounded p-3 max-h-[300px] overflow-y-auto space-y-4">
+                    <?php $__currentLoopData = $locations->groupBy('division.name'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $divisionName => $divLocations): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <div>
+                            <h4 class="font-bold text-xs uppercase text-gray-500 mb-2 border-b pb-1">
+                                <?php echo e($divisionName ?? 'Lainnya'); ?>
 
-                        </option>
+                            </h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                <?php $__currentLoopData = $divLocations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $location): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <label class="flex items-center space-x-2 text-sm cursor-pointer p-1 hover:bg-gray-50 rounded">
+                                        <input 
+                                            type="checkbox" 
+                                            name="location_ids[]" 
+                                            value="<?php echo e($location->id); ?>"
+                                            class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                            <?php echo e(in_array($location->id, old('location_ids', [])) ? 'checked' : ''); ?>
+
+                                        >
+                                        <span class="text-gray-700"><?php echo e($location->name); ?></span>
+                                    </label>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </div>
+                        </div>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                </select>
+                </div>
+                <?php $__errorArgs = ['location_ids'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                    <p class="text-sm text-red-500 mt-1"><?php echo e($message); ?></p>
+                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
+                <?php $__errorArgs = ['location_ids.*'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                    <p class="text-sm text-red-500 mt-1"><?php echo e($message); ?></p>
+                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
             </div>
 
             <!-- PERIODE -->
@@ -217,7 +250,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const start = flatpickr("#start_date", {
         dateFormat: "Y-m-d",
         altInput: true,
-        altFormat: "d/m/Y",
+        altFormat: "d-m-Y",
         locale: "id",
         onChange: function(selectedDates) {
             end.set('minDate', selectedDates[0]);
@@ -227,7 +260,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const end = flatpickr("#end_date", {
         dateFormat: "Y-m-d",
         altInput: true,
-        altFormat: "d/m/Y",
+        altFormat: "d-m-Y",
         locale: "id",
         minDate: "today"
     });

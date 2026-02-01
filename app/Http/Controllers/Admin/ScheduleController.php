@@ -146,10 +146,6 @@ class ScheduleController extends Controller
         $createdSchedules = [];
         $skippedDates = [];
 
-        // Note: Conflict checking with other groups for specific locations is more complex now with many-to-many.
-        // For simplicity in this step, we'll create the schedules first. 
-        // A strict conflict check would require checking if ANY of the selected locations are occupied.
-
         $currentDate = $startDate->copy();
         while ($currentDate <= $endDate) {
             $dayOfWeek = $currentDate->dayOfWeek;

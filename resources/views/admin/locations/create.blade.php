@@ -182,7 +182,7 @@
                     const query = searchInput.value;
                     if (!query) return;
 
-                    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`)
+                    fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=5&q=${query}`)
                         .then(response => response.json())
                         .then(data => {
                             searchResults.innerHTML = '';

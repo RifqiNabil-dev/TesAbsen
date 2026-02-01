@@ -3,207 +3,243 @@
 <?php $__env->startSection('title', 'Tambah Lokasi'); ?>
 
 <?php $__env->startSection('content'); ?>
-<div class="max-w-xl mx-auto bg-white rounded-lg shadow border border-gray-200">
+    <div class="max-w-xl mx-auto bg-white rounded-lg shadow border border-gray-200">
 
-    <!-- HEADER -->
-    <div class="border-b px-6 py-4">
-        <h2 class="text-lg font-bold text-gray-800">
-            Tambah Lokasi
-        </h2>
-    </div>
+        <!-- HEADER -->
+        <div class="border-b px-6 py-4">
+            <h2 class="text-lg font-bold text-gray-800">
+                Tambah Lokasi
+            </h2>
+        </div>
 
-    <!-- BODY -->
-    <div class="p-6">
-        <form method="POST" action="<?php echo e(route('admin.locations.store')); ?>">
-            <?php echo csrf_field(); ?>
+        <!-- BODY -->
+        <div class="p-6">
+            <form method="POST" action="<?php echo e(route('admin.locations.store')); ?>">
+                <?php echo csrf_field(); ?>
 
-            <!-- NAMA LOKASI -->
-            <div class="mb-4">
-                <label class="block text-sm font-semibold text-gray-700 mb-1">
-                    Nama Lokasi <span class="text-red-500">*</span>
-                </label>
-                <input
-                    type="text"
-                    name="name"
-                    value="<?php echo e(old('name')); ?>"
-                    required
-                    class="w-full rounded border border-gray-300 px-3 py-2 text-sm
-                           focus:ring focus:ring-blue-200 focus:border-blue-500"
-                >
-            </div>
-            
-            <!-- DESKRIPSI -->
-            <div class="mb-4">
-                <label class="block text-sm font-semibold text-gray-700 mb-1">
-                    Deskripsi
-                </label>
-                <textarea
-                    name="description"
-                    rows="3"
-                    class="w-full rounded border border-gray-300 px-3 py-2 text-sm
-                           focus:ring focus:ring-blue-200 focus:border-blue-500"
-                ><?php echo e(old('description')); ?></textarea>
-            </div>
-
-            
-            <!-- MAP -->
-            <div class="mb-4">
-                <label class="block text-sm font-semibold text-gray-700 mb-2">
-                    Pilih Titik Lokasi Magang <span class="text-red-500">*</span>
-                </label>
-
-                <div id="map" class="w-full h-72 rounded border"></div>
-                <p class="text-xs text-gray-500 mt-1">
-                    Klik pada peta untuk menentukan titik lokasi absensi
-                </p>
-            </div>
-
-            <!-- KOORDINAT -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
+                <!-- NAMA LOKASI -->
+                <div class="mb-4">
                     <label class="block text-sm font-semibold text-gray-700 mb-1">
-                        Latitude
+                        Nama Lokasi <span class="text-red-500">*</span>
                     </label>
-                    <input
-                    type="number"
-                    step="0.0000001"
-                    name="latitude"
-                    id="latitude"
-                    required
-                    class="w-full rounded border border-gray-300 px-3 py-2 text-sm"
-                    >
+                    <input type="text" name="name" value="<?php echo e(old('name')); ?>" required class="w-full rounded border border-gray-300 px-3 py-2 text-sm
+                               focus:ring focus:ring-blue-200 focus:border-blue-500">
                 </div>
-                
-                <div>
+
+                <!-- DESKRIPSI -->
+                <div class="mb-4">
                     <label class="block text-sm font-semibold text-gray-700 mb-1">
-                        Longitude
+                        Deskripsi
                     </label>
-                    <input
-                    type="number"
-                    step="0.0000001"
-                    name="longitude"
-                    id="longitude"
-                    required
-                    class="w-full rounded border border-gray-300 px-3 py-2 text-sm"
-                    >
+                    <textarea name="description" rows="3" class="w-full rounded border border-gray-300 px-3 py-2 text-sm
+                               focus:ring focus:ring-blue-200 focus:border-blue-500"><?php echo e(old('description')); ?></textarea>
                 </div>
-            </div>
-            
-            <!-- RADIUS ABSENSI -->
-            <div class="mb-4">
-                <label class="block text-sm font-semibold text-gray-700 mb-1">
-                    Radius Absensi (meter) <span class="text-red-500">*</span>
-                </label>
-                
-                <input
-                type="number"
-                name="radius"
-                id="radius"
-                value="<?php echo e(old('radius', 100)); ?>"
-                min="10"
-                step="1"
-                required
-                class="w-full rounded border border-gray-300 px-3 py-2 text-sm
-                focus:ring focus:ring-blue-200 focus:border-blue-500"
-                >
-                
-                <p class="text-xs text-gray-500 mt-1">
-                    Contoh: 50 = 50 meter dari titik lokasi magang
-                </p>
-            </div>
-            
-            <!-- STATUS -->
-            <div class="mb-6">
-                <label class="inline-flex items-center gap-2">
-                    <input
-                        type="checkbox"
-                        name="is_active"
-                        value="1"
-                        <?php echo e(old('is_active', true) ? 'checked' : ''); ?>
 
-                        class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    >
-                    <span class="text-sm text-gray-700">Aktif</span>
-                </label>
-            </div>
-            
-            <!-- ACTION -->
-            <div class="flex justify-between items-center">
-                <a
-                    href="<?php echo e(route('admin.locations.index')); ?>"
-                    class="rounded bg-gray-500 px-4 py-2 text-sm text-white hover:bg-gray-600"
-                >
-                    Batal
-                </a>
 
-                <button
-                    type="submit"
-                    class="rounded bg-blue-600 px-5 py-2 text-sm font-semibold
-                           text-white hover:bg-blue-700"
-                >
-                    Simpan
-                </button>
-            </div>
-        </form>
+                <!-- Search Box (New Feature) -->
+                <div class="mb-2 relative z-[1000]">
+                    <div class="flex gap-2">
+                        <input type="text" id="searchLocation" placeholder="Cari nama lokasi (misal: Perpustakaan)"
+                            class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200 focus:border-blue-500">
+                        <button type="button" id="btnSearch"
+                            class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">
+                            Cari
+                        </button>
+                    </div>
+                    <ul id="searchResults"
+                        class="hidden absolute left-0 right-0 bg-white border border-gray-200 mt-1 max-h-48 overflow-y-auto z-50 rounded shadow-lg">
+                    </ul>
+                </div>
 
-        <script>
-            const defaultLat = -7.9721340;
-            const defaultLng = 112.6221959;
+                <!-- MAP -->
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">
+                        Pilih Titik Lokasi Magang <span class="text-red-500">*</span>
+                    </label>
 
-            const map = L.map('map').setView([defaultLat, defaultLng], 16);
+                    <div id="map" class="w-full h-72 rounded border relative z-0"></div>
+                    <p class="text-xs text-gray-500 mt-1">
+                        Klik pada peta atau gunakan pencarian untuk menentukan titik lokasi absensi
+                    </p>
+                </div>
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(map);
+                <!-- KOORDINAT -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">
+                            Latitude
+                        </label>
+                        <input type="number" step="0.0000001" name="latitude" id="latitude" required
+                            class="w-full rounded border border-gray-300 px-3 py-2 text-sm">
+                    </div>
 
-            let marker;
-            let radiusCircle;
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">
+                            Longitude
+                        </label>
+                        <input type="number" step="0.0000001" name="longitude" id="longitude" required
+                            class="w-full rounded border border-gray-300 px-3 py-2 text-sm">
+                    </div>
+                </div>
 
-            function updateMap(lat, lng, radius) {
-                if (marker) map.removeLayer(marker);
-                if (radiusCircle) map.removeLayer(radiusCircle);
+                <!-- RADIUS ABSENSI -->
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">
+                        Radius Absensi (meter) <span class="text-red-500">*</span>
+                    </label>
 
-                marker = L.marker([lat, lng]).addTo(map)
-                    .bindPopup('Titik lokasi absensi')
-                    .openPopup();
+                    <input type="number" name="radius" id="radius" value="<?php echo e(old('radius', 100)); ?>" min="10" step="1"
+                        required class="w-full rounded border border-gray-300 px-3 py-2 text-sm
+                    focus:ring focus:ring-blue-200 focus:border-blue-500">
 
-                radiusCircle = L.circle([lat, lng], {
-                    radius: radius,
-                    color: 'blue',
-                    fillOpacity: 0.2
+                </div>
+
+                <!-- STATUS -->
+                <div class="mb-6">
+                    <label class="inline-flex items-center gap-2">
+                        <input type="checkbox" name="is_active" value="1" <?php echo e(old('is_active', true) ? 'checked' : ''); ?>
+
+                            class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        <span class="text-sm text-gray-700">Aktif</span>
+                    </label>
+                </div>
+
+                <!-- ACTION -->
+                <div class="flex justify-between items-center">
+                    <a href="<?php echo e(route('admin.locations.index')); ?>"
+                        class="rounded bg-gray-500 px-4 py-2 text-sm text-white hover:bg-gray-600">
+                        Batal
+                    </a>
+
+                    <button type="submit" class="rounded bg-blue-600 px-5 py-2 text-sm font-semibold
+                               text-white hover:bg-blue-700">
+                        Simpan
+                    </button>
+                </div>
+            </form>
+
+            <script>
+                const defaultLat = -7.9721340;
+                const defaultLng = 112.6221959;
+
+                const map = L.map('map').setView([defaultLat, defaultLng], 16);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap contributors'
                 }).addTo(map);
-            }
 
-            // default marker
-            updateMap(defaultLat, defaultLng, document.getElementById('radius').value);
-            document.getElementById('latitude').value = defaultLat.toFixed(7);
-            document.getElementById('longitude').value = defaultLng.toFixed(7);
+                let marker;
+                let radiusCircle;
 
-            map.on('click', function (e) {
-                const lat = e.latlng.lat.toFixed(7);
-                const lng = e.latlng.lng.toFixed(7);
-                const radius = document.getElementById('radius').value;
+                function updateMap(lat, lng, radius) {
+                    if (marker) map.removeLayer(marker);
+                    if (radiusCircle) map.removeLayer(radiusCircle);
 
-                document.getElementById('latitude').value = lat;
-                document.getElementById('longitude').value = lng;
+                    marker = L.marker([lat, lng]).addTo(map)
+                        .bindPopup('Titik lokasi absensi')
+                        .openPopup();
 
-                updateMap(lat, lng, radius);
-            });
+                    radiusCircle = L.circle([lat, lng], {
+                        radius: radius,
+                        color: 'blue',
+                        fillOpacity: 0.2
+                    }).addTo(map);
 
-            // Update radius realtime
-            document.getElementById('radius').addEventListener('input', function () {
-                const lat = document.getElementById('latitude').value;
-                const lng = document.getElementById('longitude').value;
-
-                if (lat && lng) {
-                    updateMap(lat, lng, this.value);
+                    map.setView([lat, lng], 16);
                 }
-            });
-        </script>
+
+                // default marker initialization
+                updateMap(defaultLat, defaultLng, document.getElementById('radius').value);
+                document.getElementById('latitude').value = defaultLat.toFixed(7);
+                document.getElementById('longitude').value = defaultLng.toFixed(7);
+
+                map.on('click', function (e) {
+                    const lat = e.latlng.lat.toFixed(7);
+                    const lng = e.latlng.lng.toFixed(7);
+                    const radius = document.getElementById('radius').value;
+
+                    document.getElementById('latitude').value = lat;
+                    document.getElementById('longitude').value = lng;
+
+                    updateMap(lat, lng, radius);
+                });
+
+                // Update radius realtime
+                document.getElementById('radius').addEventListener('input', function () {
+                    const lat = document.getElementById('latitude').value;
+                    const lng = document.getElementById('longitude').value;
+
+                    if (lat && lng) {
+                        updateMap(lat, lng, this.value);
+                    }
+                });
+
+                // --- SEARCH FEATURE ---
+                const btnSearch = document.getElementById('btnSearch');
+                const searchInput = document.getElementById('searchLocation');
+                const searchResults = document.getElementById('searchResults');
+
+                btnSearch.addEventListener('click', function () {
+                    const query = searchInput.value;
+                    if (!query) return;
+
+                    fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=5&q=${query}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            searchResults.innerHTML = '';
+                            searchResults.classList.remove('hidden');
+
+                            if (data.length === 0) {
+                                const li = document.createElement('li');
+                                li.className = 'px-3 py-2 text-sm text-gray-500';
+                                li.textContent = 'Lokasi tidak ditemukan';
+                                searchResults.appendChild(li);
+                                return;
+                            }
+
+                            data.forEach(place => {
+                                const li = document.createElement('li');
+                                li.className = 'px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer border-b last:border-0';
+                                li.textContent = place.display_name;
+                                li.onclick = function () {
+                                    const lat = parseFloat(place.lat);
+                                    const lon = parseFloat(place.lon);
+                                    const radius = document.getElementById('radius').value;
+
+                                    document.getElementById('latitude').value = lat.toFixed(7);
+                                    document.getElementById('longitude').value = lon.toFixed(7);
+
+                                    updateMap(lat, lon, radius);
+                                    searchResults.classList.add('hidden');
+                                };
+                                searchResults.appendChild(li);
+                            });
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            alert('Gagal mencari lokasi. Silakan coba lagi.');
+                        });
+                });
+
+                // Allow Enter key to search
+                searchInput.addEventListener('keypress', function (e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        btnSearch.click();
+                    }
+                });
+
+                // Close results when clicking outside
+                document.addEventListener('click', function (e) {
+                    if (!searchResults.contains(e.target) && e.target !== searchInput && e.target !== btnSearch) {
+                        searchResults.classList.add('hidden');
+                    }
+                });
+
+            </script>
 
 
+        </div>
     </div>
-</div>
 <?php $__env->stopSection(); ?>
-
 <?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\Si-Magang\resources\views/admin/locations/create.blade.php ENDPATH**/ ?>

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Laporan Peserta')
+@section('title', 'Edit Laporan')
 
 @section('content')
 
@@ -123,109 +123,123 @@
         </div>
     @endif
 
-    <!-- ================= FORM PENILAIAN BARU ================= -->
-    <div class="bg-white rounded-lg shadow border border-gray-200">
+<div class="bg-white rounded-lg shadow border border-gray-200 p-6">
 
-        <div class="border-b px-6 py-4">
-            <h5 class="text-lg font-semibold text-gray-800">Buat Penilaian Baru</h5>
+    <h2 class="text-lg font-bold mb-6 flex items-center gap-2 text-gray-800">
+        <i class="bi bi-pencil-square"></i>
+        Edit Penilaian Akhir
+    </h2>
+
+    <form method="POST"
+          action="{{ route('admin.reports.update', $user) }}">
+        @csrf
+        @method('PUT')
+
+        {{-- ================= NILAI UTAMA ================= --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+
+            <div>
+                <label class="block text-sm font-semibold mb-1">
+                    Nilai Kehadiran (0–20)
+                </label>
+                <input type="number" name="attendance_score" min="0" max="20"
+                       value="{{ old('attendance_score', $latestAssessment->attendance_score) }}"
+                       class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200"
+                       required>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold mb-1">
+                    Nilai Kedisiplinan (0–20)
+                </label>
+                <input type="number" name="discipline_score" min="0" max="20"
+                       value="{{ old('discipline_score', $latestAssessment->discipline_score) }}"
+                       class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200"
+                       required>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold mb-1">
+                    Nilai Kinerja (0–20)
+                </label>
+                <input type="number" name="performance_score" min="0" max="20"
+                       value="{{ old('performance_score', $latestAssessment->performance_score) }}"
+                       class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200"
+                       required>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold mb-1">
+                    Nilai Inisiatif (0–20)
+                </label>
+                <input type="number" name="initiative_score" min="0" max="20"
+                       value="{{ old('initiative_score', $latestAssessment->initiative_score) }}"
+                       class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200"
+                       required>
+            </div>
         </div>
 
-        <div class="p-6">
-            <form method="POST" action="{{ route('admin.reports.assessment', $user) }}">
-                @csrf
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label class="block text-sm font-semibold mb-1">Nilai Kehadiran (0–20)</label>
-                        <input type="number" name="attendance_score" min="0" max="20"
-                            value="{{ old('attendance_score', 0) }}"
-                            class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200"
-                            required>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold mb-1">Nilai Kedisiplinan (0–20)</label>
-                        <input type="number" name="discipline_score" min="0" max="20"
-                            value="{{ old('discipline_score', 0) }}"
-                            class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200"
-                            required>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label class="block text-sm font-semibold mb-1">Nilai Kinerja (0–20)</label>
-                        <input type="number" name="performance_score" min="0" max="20"
-                            value="{{ old('performance_score', 0) }}"
-                            class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200"
-                            required>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold mb-1">Nilai Inisiatif (0–20)</label>
-                        <input type="number" name="initiative_score" min="0" max="20"
-                            value="{{ old('initiative_score', 0) }}"
-                            class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200"
-                            required>
-                    </div>
-                </div>
-
-                <div class="mb-4">
-                    <label class="block text-sm font-semibold mb-1">Nilai Kerjasama (0–20)</label>
-                    <input type="number" name="cooperation_score" min="0" max="20" value="{{ old('cooperation_score', 0) }}"
-                        class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200"
-                        required>
-                </div>
-
-                <div class="mb-4">
-                    <label class="block text-sm font-semibold mb-1">Kekuatan</label>
-                    <textarea name="strengths" rows="3"
-                        class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200">{{ old('strengths') }}</textarea>
-                </div>
-
-                <div class="mb-4">
-                    <label class="block text-sm font-semibold mb-1">Kelemahan</label>
-                    <textarea name="weaknesses" rows="3"
-                        class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200">{{ old('weaknesses') }}</textarea>
-                </div>
-
-                <div class="mb-6">
-                    <label class="block text-sm font-semibold mb-1">Rekomendasi</label>
-                    <textarea name="recommendations" rows="3"
-                        class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200">{{ old('recommendations') }}</textarea>
-                </div>
-
-                <div class="flex justify-between">
-                    <a href="{{ route('admin.reports.index') }}"
-                        class="rounded bg-gray-500 px-4 py-2 text-sm text-white hover:bg-gray-600">
-                        Kembali
-                    </a>
-
-                    <button type="submit"
-                        class="rounded bg-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-700">
-                        Simpan Penilaian
-                    </button>
-                </div>
-
-            </form>
+        <div class="mb-4">
+            <label class="block text-sm font-semibold mb-1">
+                Nilai Kerjasama (0–20)
+            </label>
+            <input type="number" name="cooperation_score" min="0" max="20"
+                   value="{{ old('cooperation_score', $latestAssessment->cooperation_score) }}"
+                   class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200"
+                   required>
         </div>
-    </div>
+
+        {{-- ================= CATATAN ================= --}}
+        <div class="mb-4">
+            <label class="block text-sm font-semibold mb-1">Kekuatan</label>
+            <textarea name="strengths" rows="3"
+                class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200">{{ old('strengths', $latestAssessment->strengths) }}</textarea>
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-sm font-semibold mb-1">Kelemahan</label>
+            <textarea name="weaknesses" rows="3"
+                class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200">{{ old('weaknesses', $latestAssessment->weaknesses) }}</textarea>
+        </div>
+
+        <div class="mb-6">
+            <label class="block text-sm font-semibold mb-1">Rekomendasi</label>
+            <textarea name="recommendations" rows="3"
+                class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200">{{ old('recommendations', $latestAssessment->recommendations) }}</textarea>
+        </div>
+
+        {{-- ================= AKSI ================= --}}
+        <div class="flex justify-between">
+            <a href="{{ route('admin.reports.index') }}"
+               class="rounded bg-gray-500 px-4 py-2 text-sm text-white hover:bg-gray-600">
+                Kembali
+            </a>
+
+            <button type="submit"
+                class="rounded bg-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+                Simpan Perubahan
+            </button>
+        </div>
+
+    </form>
+</div>
+
 
 <script>
-    @if(session('alert') === 'assessment_saved')
-        Swal.fire({
-            icon: 'success',
-            title: 'Berhasil',
-            text: 'Penilaian berhasil disimpan.',
-            timer: 3000,
-            timerProgressBar: true,
-            showConfirmButton: false
-        });
+@if(session('alert') === 'assessment_updated')
+    Swal.fire({
+        icon: 'success',
+        title: 'Berhasil',
+        text: 'Penilaian berhasil diperbarui.',
+        timer: 2500,
+        timerProgressBar: true,
+        showConfirmButton: false
+    });
 
-        setTimeout(() => {
-            window.location.href = "{{ route('admin.reports.index') }}";
-        }, 3000);
-    @endif
+    setTimeout(() => {
+        window.location.href = "{{ route('admin.reports.index') }}";
+    }, 2500);
+@endif
 </script>
 
 @endsection
