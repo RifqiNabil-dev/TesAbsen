@@ -11,6 +11,12 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        // 1. Run Static Data Seeders first
+        $this->call([
+            DivisionSeeder::class,
+            GroupSeeder::class,
+        ]);
+
         // Create Admin
         User::create([
             'name' => 'Admin PKL',
