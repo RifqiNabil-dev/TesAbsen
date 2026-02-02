@@ -60,7 +60,7 @@ class ScheduleController extends Controller
         $startDate = Carbon::parse($validated['start_date']);
         $endDate = Carbon::parse($validated['end_date']);
 
-        $schedules = Schedule::with(['user', 'locations'])
+        $schedules = Schedule::with(['user', 'locations.division'])
             ->whereHas('user', function ($q) use ($group) {
                 $q->where('group_id', $group->id);
             })
@@ -112,7 +112,17 @@ class ScheduleController extends Controller
             ];
         }
 
-        return view('admin.schedules.print', compact('data', 'group', 'startDate', 'endDate'));
+        // Get unique division names from all locations involved
+        $divisionNames = $schedules->flatMap(function ($schedule) {
+            return $schedule->locations->pluck('division.name');
+        })->unique()->filter()->implode(', ');
+
+        // If multiple divisions, maybe show them all or handle accordingly. 
+        // For now, joining them with commas.
+        // If no division found (empty), you might want a default text.
+        $divisionName = $divisionNames ?: 'BIDANG LAYANAN DAN PENGEMBANGAN PERPUSTAKAAN';
+
+        return view('admin.schedules.print', compact('data', 'group', 'startDate', 'endDate', 'divisionName'));
     }
 
 
@@ -164,7 +174,7 @@ class ScheduleController extends Controller
             if ($conflicts->isNotEmpty()) {
 
                 $conflict = $conflicts->first();
- 
+
                 $conflictingLocationIds = $conflict->locations->pluck('id')->intersect($validated['location_ids']);
                 $locationName = Location::whereIn('id', $conflictingLocationIds)->pluck('name')->implode(', ');
 

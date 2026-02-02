@@ -8,7 +8,7 @@
         <!-- HEADER -->
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                👥 Kelompok Magang
+                <i class="bi bi-people"></i> Kelompok Magang
             </h2>
 
             <a href="<?php echo e(route('admin.groups.create')); ?>"
@@ -72,12 +72,12 @@
                                     class="inline-block rounded bg-yellow-500 px-2 py-1 text-white hover:bg-yellow-600">
                                     <i class="bi bi-pencil"></i>
                                 </a>
-
-                                <form action="<?php echo e(route('admin.groups.destroy', $group)); ?>" method="POST" class="inline"
-                                    onsubmit="return confirm('Yakin ingin menghapus kelompok ini? Semua anggota akan dikeluarkan dari kelompok.')">
+                                <form action="<?php echo e(route('admin.groups.destroy', $group)); ?>" method="POST" class="inline">
                                     <?php echo csrf_field(); ?>
                                     <?php echo method_field('DELETE'); ?>
-                                    <button type="submit" class="rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600">
+                                    <button type="button"
+                                        onclick="confirmDeleteGroup(this)"
+                                        class="rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </form>
@@ -94,5 +94,36 @@
             </table>
         </div>
     </div>
+
+<script>
+    function confirmDeleteGroup(button) {
+        const form = button.closest('form');
+
+        Swal.fire({
+            title: 'Hapus Kelompok?',
+            text: 'Semua anggota akan dikeluarkan dari kelompok ini.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Ya, hapus',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    }
+
+    <?php if(session('success')): ?>
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: '<?php echo e(session('success')); ?>',
+            confirmButtonColor: '#2563eb'
+        });
+    <?php endif; ?>
+</script>
+
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\intan\Downloads\PKL\TesAbsen\resources\views/admin/groups/index.blade.php ENDPATH**/ ?>

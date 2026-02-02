@@ -88,7 +88,7 @@ unset($__errorArgs, $__bag); ?>
                 <!-- PILIH MAHASISWA -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Pilih Mahasiswa untuk Kelompok
+                        Pilih Peserta untuk Kelompok
                     </label>
 
                     <div class="max-h-72 overflow-y-auto rounded border border-gray-300 p-3 space-y-2">

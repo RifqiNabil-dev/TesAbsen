@@ -13,10 +13,17 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/id.js"></script>
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
     <?php echo $__env->yieldPushContent('styles'); ?>
 </head>
 
@@ -30,11 +37,8 @@
             <div class="flex items-center justify-between h-16">
 
                 <!-- LEFT : BRAND -->
-                <a href="<?php echo e(auth()->user() && auth()->user()->isAdmin()
-    ? route('admin.dashboard')
-    : (auth()->user()
-        ? route('mahasiswa.dashboard')
-        : route('login'))); ?>" class="flex items-center gap-3">
+                <a href="<?php echo e(auth()->user() && auth()->user()->isAdmin() ? route('admin.dashboard') : (auth()->user()
+                        ? route('mahasiswa.dashboard') : route('login'))); ?>" class="flex items-center gap-3">
                     <img src="<?php echo e(asset('img/logo_instansi.png')); ?>" alt="Logo Instansi"
                         class="h-12 w-auto object-contain">
                 </a>
@@ -75,6 +79,9 @@
                             <li><a href="<?php echo e(route('admin.reports.index')); ?>"
                                     class="hover:text-blue-600 transition <?php echo e(request()->routeIs('admin.reports.*') ? 'text-blue-600' : ''); ?>">Laporan</a>
                             </li>
+                            <li><a href="<?php echo e(route('admin.users.index')); ?>"
+                                    class="hover:text-blue-600 transition <?php echo e(request()->routeIs('admin.users.index') ? 'text-blue-600' : ''); ?>">User Role</a>
+                            </li>
                         <?php else: ?>
                             <li><a href="<?php echo e(route('mahasiswa.dashboard')); ?>"
                                     class="hover:text-blue-600 transition <?php echo e(request()->routeIs('mahasiswa.dashboard') ? 'text-blue-600' : ''); ?>">Dashboard</a>
@@ -107,7 +114,7 @@
                             </div>
                         </button>
 
-                        <div x-show="profileOpen" @click.outside="profileOpen=false"
+                        <div x-show="profileOpen" @click.outside="profileOpen=false" x-cloak
                             x-transition:enter="transition ease-out duration-100"
                             x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
                             x-transition:leave="transition ease-in duration-75"
@@ -135,7 +142,7 @@
 
             <!-- MOBILE MENU -->
             <?php if(auth()->guard()->check()): ?>
-                <div x-show="mobileOpen" x-transition class="md:hidden pb-4 space-y-1">
+                <div x-show="mobileOpen" x-cloak x-transition class="md:hidden pb-4 space-y-1">
                     <div class="pt-2 pb-3 space-y-1">
                         <?php if(auth()->user()->isAdmin()): ?>
                             <a href="<?php echo e(route('admin.dashboard')); ?>"
@@ -154,6 +161,8 @@
                                 class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">Logbook</a>
                             <a href="<?php echo e(route('admin.reports.index')); ?>"
                                 class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">Laporan</a>
+                            <a href="<?php echo e(route('admin.users.index')); ?>"
+                                class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">User Role</a>
                         <?php else: ?>
                             <a href="<?php echo e(route('mahasiswa.dashboard')); ?>"
                                 class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">Dashboard</a>
@@ -203,28 +212,6 @@
     <!-- MAIN CONTENT -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-        <!-- SUCCESS -->
-        <?php if(session('success')): ?>
-            <div class="mb-6 flex items-center gap-3 rounded-lg bg-green-50 border border-green-200 text-green-700 px-4 py-3 shadow-sm"
-                role="alert">
-                <i class="bi bi-check-circle-fill text-green-500 text-lg"></i>
-                <span class="flex-grow font-medium"><?php echo e(session('success')); ?></span>
-                <button onclick="this.parentElement.remove()" class="text-green-500 hover:text-green-700"><i
-                        class="bi bi-x-lg"></i></button>
-            </div>
-        <?php endif; ?>
-
-        <!-- ERROR -->
-        <?php if(session('error')): ?>
-            <div class="mb-6 flex items-center gap-3 rounded-lg bg-red-50 border border-red-200 text-red-700 px-4 py-3 shadow-sm"
-                role="alert">
-                <i class="bi bi-exclamation-triangle-fill text-red-500 text-lg"></i>
-                <span class="flex-grow font-medium"><?php echo e(session('error')); ?></span>
-                <button onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-700"><i
-                        class="bi bi-x-lg"></i></button>
-            </div>
-        <?php endif; ?>
-
         <!-- VALIDATION ERRORS -->
         <?php if($errors->any()): ?>
             <div class="mb-6 rounded-lg bg-red-50 border border-red-200 text-red-700 px-4 py-3 shadow-sm">
@@ -252,13 +239,11 @@
     </footer>
 
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/id.js"></script>
+
     <script>
-        // Initialize Flatpickr untuk semua input dengan class datepicker (kecuali yang sudah di-initialize manual)
+
         document.addEventListener('DOMContentLoaded', function () {
-            // Hanya initialize yang belum di-initialize
+
             document.querySelectorAll('.datepicker:not([data-fp-initialized])').forEach(function (el) {
                 flatpickr(el, {
                     dateFormat: 'Y-m-d',

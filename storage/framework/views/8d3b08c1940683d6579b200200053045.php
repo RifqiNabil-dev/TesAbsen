@@ -115,7 +115,7 @@
                                     <?php echo e($logbook->approver->name); ?>
 
                                     <span class="text-gray-500 text-xs">
-                                        (<?php echo e($logbook->approved_at->format('d/m/Y H:i')); ?>)
+                                        (<?php echo e($logbook->approved_at->format('d-m-Y H:i')); ?>)
                                     </span>
                                 </td>
                             </tr>
@@ -137,18 +137,18 @@
                         </label>
                         <textarea id="admin_notes" name="admin_notes" rows="3"
                             class="w-full rounded border border-gray-300 px-3 py-2 text-sm
-                                           focus:ring focus:ring-blue-200 focus:border-blue-500"><?php echo e(old('admin_notes')); ?></textarea>
+                                                   focus:ring focus:ring-blue-200 focus:border-blue-500"><?php echo e(old('admin_notes')); ?></textarea>
                     </div>
 
                     <div class="flex gap-3">
                         <button type="submit" name="status" value="approved" class="inline-flex items-center gap-2 rounded bg-green-600 px-4 py-2
-                                           text-sm font-semibold text-white hover:bg-green-700">
+                                                   text-sm font-semibold text-white hover:bg-green-700">
                             <i class="bi bi-check-circle"></i>
                             Setujui
                         </button>
 
                         <button type="submit" name="status" value="rejected" class="inline-flex items-center gap-2 rounded bg-red-600 px-4 py-2
-                                           text-sm font-semibold text-white hover:bg-red-700">
+                                                   text-sm font-semibold text-white hover:bg-red-700">
                             <i class="bi bi-x-circle"></i>
                             Tolak
                         </button>
@@ -158,7 +158,7 @@
 
             <!-- BACK BUTTON -->
             <a href="<?php echo e(route('admin.logbooks.index')); ?>" class="inline-block rounded bg-gray-500 px-4 py-2 text-sm
-                           text-white hover:bg-gray-600">
+                               text-white hover:bg-gray-600">
                 Kembali
             </a>
 

@@ -6,19 +6,28 @@
 <div class="max-w-6xl mx-auto">
 
     <!-- HEADER -->
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex items-center justify-between mb-6">
         <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
             <i class="bi bi-geo-alt"></i> Lokasi
         </h2>
 
-        <a
-            href="<?php echo e(route('admin.locations.create')); ?>"
-            class="inline-flex items-center gap-2 rounded bg-blue-600 px-4 py-2
-                   text-sm font-semibold text-white hover:bg-blue-700"
-        >
-            <i class="bi bi-plus-circle"></i> Tambah Lokasi
-        </a>
+        <div class="flex items-center gap-2">
+            <a href="<?php echo e(route('admin.divisions.index')); ?>"
+                class="inline-flex items-center gap-2 rounded bg-blue-600 px-4 py-2
+                    text-sm font-semibold text-white hover:bg-blue-700"
+            >
+                <i class="bi bi-eye"></i> Lihat Divisi
+            </a>
+
+            <a href="<?php echo e(route('admin.locations.create')); ?>"
+                class="inline-flex items-center gap-2 rounded bg-blue-600 px-4 py-2
+                    text-sm font-semibold text-white hover:bg-blue-700"
+            >
+                <i class="bi bi-plus-circle"></i> Tambah Lokasi
+            </a>
+        </div>
     </div>
+
 
     <!-- TABLE CARD -->
     <div class="bg-white rounded-lg shadow border border-gray-200">
@@ -28,9 +37,10 @@
                     <tr class="text-left text-gray-700">
                         <th class="px-4 py-3">Nama</th>
                         <th class="px-4 py-3">Deskripsi</th>
-                        <th class="px-4 py-3">Koordinat</th> <!-- Kolom koordinat -->
+                        <th class="px-4 py-3">Divisi</th> <!-- Kolom Divisi -->
+                        <th class="px-4 py-3 text-center">Koordinat</th> <!-- Kolom koordinat -->
                         <th class="px-4 py-3">Status</th>
-                        <th class="px-4 py-3 w-32">Aksi</th>
+                        <th class="px-4 py-3 w-32 text-center">Aksi</th>
                     </tr>
                 </thead>
 
@@ -47,8 +57,14 @@
 
                             </td>
 
+                            <!-- Display Division -->
                             <td class="px-4 py-3 text-gray-600">
-                                <?php echo e($location->latitude); ?>, <?php echo e($location->longitude); ?> <!-- Kolom Koordinat -->
+                                <?php echo e($location->division->name ?? '-'); ?>  <!-- Menampilkan nama division -->
+                            </td>
+
+                            <td class="px-4 py-3 text-gray-600 text-center">
+                                <?php echo e($location->latitude); ?>, <?php echo e($location->longitude); ?>
+
                             </td>
 
                             <td class="px-4 py-3">
@@ -63,7 +79,7 @@
                                 <?php endif; ?>
                             </td>
 
-                            <td class="px-4 py-3">
+                            <td class="px-4 py-3 text-center">
                                 <div class="flex items-center gap-2">
                                     <a
                                         href="<?php echo e(route('admin.locations.edit', $location)); ?>"
@@ -76,7 +92,7 @@
                                     <form
                                         action="<?php echo e(route('admin.locations.destroy', $location)); ?>"
                                         method="POST"
-                                        onsubmit="return confirm('Yakin ingin menghapus?')"
+                                        class="delete-form"
                                     >
                                         <?php echo csrf_field(); ?>
                                         <?php echo method_field('DELETE'); ?>
@@ -93,7 +109,7 @@
                         </tr>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                         <tr>
-                            <td colspan="5" class="px-4 py-6 text-center text-gray-500">
+                            <td colspan="6" class="px-4 py-6 text-center text-gray-500">
                                 Tidak ada data lokasi
                             </td>
                         </tr>
@@ -103,6 +119,50 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.querySelectorAll('.delete-form').forEach(form => {
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            Swal.fire({
+                title: 'Hapus Lokasi?',
+                text: 'Data lokasi akan dihapus secara permanen.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Ya, hapus',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    });
+
+    // Alert sukses
+    <?php if(session('success')): ?>
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil',
+            text: '<?php echo e(session('success')); ?>',
+            confirmButtonColor: '#2563eb'
+        });
+    <?php endif; ?>
+
+    // Alert gagal
+    <?php if(session('error')): ?>
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal',
+            text: '<?php echo e(session('error')); ?>',
+            confirmButtonColor: '#dc2626'
+        });
+    <?php endif; ?>
+</script>
+
 <?php $__env->stopSection(); ?>
 
 <?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\Users\intan\Downloads\PKL\TesAbsen\resources\views/admin/locations/index.blade.php ENDPATH**/ ?>
