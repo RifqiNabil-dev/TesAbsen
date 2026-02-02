@@ -10,6 +10,9 @@ use App\Http\Controllers\Admin\AttendanceController as AdminAttendance;
 use App\Http\Controllers\Admin\LogbookController as AdminLogbook;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\GroupController;
+use App\Http\Controllers\Admin\DivisionController;
+
+use App\Http\Controllers\Mahasiswa\PermissionMahasiswaController;
 use App\Http\Controllers\Mahasiswa\DashboardController as MahasiswaDashboard;
 use App\Http\Controllers\Mahasiswa\AttendanceController as MahasiswaAttendance;
 use App\Http\Controllers\Mahasiswa\LogbookController as MahasiswaLogbook;
@@ -43,8 +46,13 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/groups/{group}/members', [GroupController::class, 'addMember'])->name('groups.add-member');
     Route::delete('/groups/{group}/members/{user}', [GroupController::class, 'removeMember'])->name('groups.remove-member');
 
+    Route::get('/divisions', [DivisionController::class, 'index'])->name('divisions.index');
+    Route::resource('divisions', DivisionController::class);
+
     Route::get('/attendance', [AdminAttendance::class, 'index'])->name('attendance.index');
     Route::get('/attendance/{attendance}', [AdminAttendance::class, 'show'])->name('attendance.show');
+    Route::put('/attendance/{attendance}/update-status', [AdminAttendance::class, 'updateStatus'])->name('attendance.updateStatus');
+
 
     Route::get('/logbooks', [AdminLogbook::class, 'index'])->name('logbooks.index');
     Route::get('/logbooks/{logbook}', [AdminLogbook::class, 'show'])->name('logbooks.show');

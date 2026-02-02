@@ -34,9 +34,7 @@
                 </a>
 
                 <!-- BULK DELETE FORM -->
-                <form action="<?php echo e(route('admin.schedules.bulk-destroy')); ?>" method="POST"
-                    onsubmit="return confirm('Yakin ingin menghapus jadwal yang dipilih?');" class="hidden"
-                    id="bulkDeleteForm">
+                <form action="<?php echo e(route('admin.schedules.bulk-destroy')); ?>" method="POST" class="hidden" id="bulkDeleteForm">
                     <?php echo csrf_field(); ?>
                     <?php echo method_field('DELETE'); ?>
                     <button type="submit"
@@ -58,7 +56,8 @@
                 <div>
                     <label class="text-xs font-semibold text-gray-500 mb-1 block">Peserta</label>
                     <select name="user_id"
-                        class="w-full text-sm rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500">
+                        class="w-full rounded border border-gray-300 px-3 py-2 text-sm
+                       focus:ring focus:ring-blue-200 focus:outline-none">
                         <option value="">Semua Peserta</option>
                         <?php $__currentLoopData = $usersInGroup; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $u): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <option value="<?php echo e($u->id); ?>" <?php echo e(request('user_id') == $u->id ? 'selected' : ''); ?>>
@@ -72,15 +71,15 @@
                 <!-- Filter Date Start -->
                 <div>
                     <label class="text-xs font-semibold text-gray-500 mb-1 block">Dari Tanggal</label>
-                    <input type="date" name="start_date" value="<?php echo e(request('start_date')); ?>"
-                        class="w-full text-sm rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500">
+                    <input type="text" id="start_date" name="start_date" value="<?php echo e(request('start_date')); ?>"
+                            class="datepicker w-full rounded border-gray-300 focus:ring-blue-500 focus:border-blue-500">
                 </div>
 
                 <!-- Filter Date End -->
                 <div>
                     <label class="text-xs font-semibold text-gray-500 mb-1 block">Sampai Tanggal</label>
-                    <input type="date" name="end_date" value="<?php echo e(request('end_date')); ?>"
-                        class="w-full text-sm rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500">
+                    <input type="text" id="end_date" name="end_date" value="<?php echo e(request('end_date')); ?>"
+                            class="datepicker w-full rounded border-gray-300 focus:ring-blue-500 focus:border-blue-500">
                 </div>
 
                 <div class="flex gap-2">
@@ -133,7 +132,7 @@
                                     class="schedule-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                             </td>
                             <td class="px-4 py-3 font-medium text-gray-900">
-                                <?php echo e($schedule->date->format('d-m-Y')); ?>
+                                <?php echo e($schedule->date->translatedFormat('j F Y')); ?>
 
                                 <span
                                     class="text-xs text-gray-500 block font-normal"><?php echo e($schedule->date->translatedFormat('l')); ?></span>
@@ -165,8 +164,8 @@
                             </td>
                             <td class="px-4 py-3 text-center relative">
                                 <form action="<?php echo e(route('admin.schedules.destroy', $schedule)); ?>" method="POST"
-                                    onsubmit="return confirm('Hapus jadwal tanggal <?php echo e($schedule->date->format('d-m-Y')); ?>?');"
-                                    class="inline-flex items-center gap-1">
+                                    data-date="<?php echo e($schedule->date->translatedFormat('j F Y')); ?>"
+                                    class="delete-jadwal inline-flex items-center gap-1">
                                     <?php echo csrf_field(); ?>
                                     <?php echo method_field('DELETE'); ?>
 
@@ -204,7 +203,6 @@
         </div>
     </div>
 
-    <?php $__env->startPush('scripts'); ?>
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 const checkAll = document.getElementById('checkAllHeader');
@@ -252,8 +250,84 @@
                     });
                 });
             });
+
+            document.addEventListener('submit', function (e) {
+                const form = e.target.closest('#bulkDeleteForm');
+                if (!form) return;
+
+                e.preventDefault();
+
+                const selectedCount = form.querySelectorAll('#bulkDeleteInputs input[name="ids[]"]').length;
+
+                Swal.fire({
+                    title: 'Yakin ingin menghapus?',
+                    text: `${selectedCount} jadwal yang dipilih akan dihapus dan tidak bisa dikembalikan.`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, hapus',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#dc2626', // merah
+                    cancelButtonColor: '#6b7280',  // abu (opsional)
+                    reverseButtons: true,
+                    focusCancel: true,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+
+            <?php if(session('success')): ?>
+                    document.addEventListener('DOMContentLoaded', () => {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: <?php echo json_encode(session('success'), 15, 512) ?>,
+                            timer: 2000,
+                            showConfirmButton: false,
+                            timerProgressBar: true,
+                        });
+                    });
+            <?php endif; ?>
+
+            <?php if(session('error')): ?>
+                    document.addEventListener('DOMContentLoaded', () => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: <?php echo json_encode(session('error'), 15, 512) ?>,
+                        });
+                    });
+            <?php endif; ?>
+            
+            document.addEventListener('submit', function (e) {
+                const form = e.target.closest('.delete-jadwal');
+                if (!form) return;
+
+                e.preventDefault();
+
+                const date = form.dataset.date || '';
+
+                Swal.fire({
+                    title: 'Hapus jadwal?',
+                    text: date ? `Hapus jadwal tanggal ${date}? Data tidak bisa dikembalikan.` : 'Data tidak bisa dikembalikan.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, hapus',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#dc2626',
+                    cancelButtonColor: '#6b7280',
+                    reverseButtons: true,
+                    focusCancel: true,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+
         </script>
-    <?php $__env->stopPush(); ?>
+
 
 <?php $__env->stopSection(); ?>
 <?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\Si-Magang\resources\views/admin/schedules/detail.blade.php ENDPATH**/ ?>

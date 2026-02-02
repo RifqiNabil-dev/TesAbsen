@@ -69,7 +69,7 @@
         <div>JADWAL PKL UNIVERSITAS BRAWIJAYA MALANG</div>
         <div>BIDANG LAYANAN DAN PENGEMBANGAN PERPUSTAKAAN</div>
         <div style="text-transform: none; margin-top: 5px;">
-            Tanggal {{ $startDate->format('d-m-Y') }} - {{ $endDate->format('d-m-Y') }}
+            Tanggal {{ $startDate->translatedFormat('j F Y') }} - {{ $endDate->translatedFormat('j F Y') }}
         </div>
         <div style="text-transform: none;">({{ $group->name }})</div>
     </div>
@@ -98,7 +98,7 @@
                         
                         <td class="text-center">
                             
-                                {{ $row['start']->format('d-m-Y') }} - {{ $row['end']->format('d-m-Y') }}
+                                {{ $row['start']->translatedFormat('j F Y') }} - <br> {{ $row['end']->translatedFormat('j F Y') }}
 
                         </td>
                         <td class="text-center">
@@ -111,7 +111,7 @@
     </table>
 
     <div class="footer">
-        <div>Malang, {{ now()->format('d-m-Y') }}</div>
+        <div>Malang, {{ now()->translatedFormat('j F Y') }}</div>
         <div>Kepala Bidang Layanan dan Pengembangan Perpustakaan</div>
         <br><br><br><br>
         <div style="font-weight: bold; text-decoration: underline; text-transform: uppercase;">LINDA DESRIWATI, SKM</div>

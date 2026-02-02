@@ -4,19 +4,21 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Location;
+use App\Models\Division;
 use Illuminate\Http\Request;
 
 class LocationController extends Controller
 {
     public function index()
     {
-        $locations = Location::latest()->paginate(15);
+        $locations = Location::with('division')->latest()->paginate(15);
         return view('admin.locations.index', compact('locations'));
     }
 
     public function create()
     {
-        return view('admin.locations.create');
+        $divisions = Division::all();
+        return view('admin.locations.create', compact('divisions'));
     }
 
     public function store(Request $request)
@@ -28,6 +30,7 @@ class LocationController extends Controller
             'latitude' => ['required', 'numeric'],
             'longitude' => ['required', 'numeric'],
             'radius' => ['required', 'integer'],
+            'division_id' => ['required', 'exists:divisions,id'],
         ]);
 
         Location::create($validated);
@@ -38,7 +41,8 @@ class LocationController extends Controller
 
     public function edit(Location $location)
     {
-        return view('admin.locations.edit', compact('location'));
+        $divisions = Division::all();
+        return view('admin.locations.edit', compact('location', 'divisions'));
     }
 
     public function update(Request $request, Location $location)
@@ -50,6 +54,7 @@ class LocationController extends Controller
             'latitude' => ['required', 'numeric'],
             'longitude' => ['required', 'numeric'],
             'radius' => ['required', 'integer'],
+            'division_id' => ['required', 'exists:divisions,id'],
         ]);
 
         $location->update($validated);

@@ -1,8 +1,8 @@
-@extends('layouts.app')
 
-@section('title', 'Detail Peserta')
 
-@section('content')
+<?php $__env->startSection('title', 'Detail Peserta'); ?>
+
+<?php $__env->startSection('content'); ?>
     <div class="max-w-5xl mx-auto space-y-6">
 
         <!-- CARD DETAIL -->
@@ -13,12 +13,12 @@
                 <h2 class="text-lg font-bold text-gray-800">Detail Peserta</h2>
 
                 <div class="flex gap-2">
-                    <a href="{{ route('admin.mahasiswa.edit', $mahasiswa) }}"
+                    <a href="<?php echo e(route('admin.mahasiswa.edit', $mahasiswa)); ?>"
                         class="inline-flex items-center gap-1 rounded bg-yellow-500 px-3 py-1.5 text-sm text-white hover:bg-yellow-600">
                         <i class="bi bi-pencil"></i> Edit
                     </a>
 
-                    <a href="{{ route('admin.reports.show', $mahasiswa) }}"
+                    <a href="<?php echo e(route('admin.reports.show', $mahasiswa)); ?>"
                         class="inline-flex items-center gap-1 rounded bg-blue-500 px-3 py-1.5 text-sm text-white hover:bg-blue-600">
                         <i class="bi bi-journal-text"></i> Laporan
                     </a>
@@ -34,29 +34,29 @@
                         <tbody class="divide-y">
                             <tr>
                                 <th class="py-2 text-left font-semibold w-40">Nama</th>
-                                <td class="py-2">{{ $mahasiswa->name }}</td>
+                                <td class="py-2"><?php echo e($mahasiswa->name); ?></td>
                             </tr>
                             <tr>
                                 <th class="py-2 text-left font-semibold">Email</th>
-                                <td class="py-2">{{ $mahasiswa->email }}</td>
+                                <td class="py-2"><?php echo e($mahasiswa->email); ?></td>
                             </tr>
                             <tr>
                                 <th class="py-2 text-left font-semibold">NIM</th>
-                                <td class="py-2">{{ $mahasiswa->nim ?? '-' }}</td>
+                                <td class="py-2"><?php echo e($mahasiswa->nim ?? '-'); ?></td>
                             </tr>
                             <tr>
                                 <th class="py-2 text-left font-semibold">Institusi</th>
-                                <td class="py-2">{{ $mahasiswa->institution ?? '-' }}</td>
+                                <td class="py-2"><?php echo e($mahasiswa->institution ?? '-'); ?></td>
                             </tr>
                             <tr>
                                 <th class="py-2 text-left font-semibold">No. Telepon</th>
-                                <td class="py-2">{{ $mahasiswa->phone ?? '-' }}</td>
+                                <td class="py-2"><?php echo e($mahasiswa->phone ?? '-'); ?></td>
                             </tr>
                             <tr>
                                 <th class="py-2 text-left font-semibold">Periode PKL</th>
                                 <td class="py-2">
-                                    @if($mahasiswa->start_date && $mahasiswa->end_date)
-                                        @php
+                                    <?php if($mahasiswa->start_date && $mahasiswa->end_date): ?>
+                                        <?php
                                             $startDate = is_string($mahasiswa->start_date)
                                                 ? \Carbon\Carbon::parse($mahasiswa->start_date)
                                                 : $mahasiswa->start_date;
@@ -64,11 +64,12 @@
                                             $endDate = is_string($mahasiswa->end_date)
                                                 ? \Carbon\Carbon::parse($mahasiswa->end_date)
                                                 : $mahasiswa->end_date;
-                                        @endphp
-                                        {{ $startDate->translatedFormat('j F Y') }} - {{ $endDate->translatedFormat('j F Y') }}
-                                    @else
+                                        ?>
+                                        <?php echo e($startDate->translatedFormat('j F Y')); ?> - <?php echo e($endDate->translatedFormat('j F Y')); ?>
+
+                                    <?php else: ?>
                                         -
-                                    @endif
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                         </tbody>
@@ -85,21 +86,24 @@
                         <li class="flex justify-between">
                             <span>Total Presensi</span>
                             <span class="font-semibold">
-                                {{ $mahasiswa->attendances->count() }}
+                                <?php echo e($mahasiswa->attendances->count()); ?>
+
                             </span>
                         </li>
 
                         <li class="flex justify-between">
                             <span>Total Logbook</span>
                             <span class="font-semibold">
-                                {{ $mahasiswa->logbooks->count() }}
+                                <?php echo e($mahasiswa->logbooks->count()); ?>
+
                             </span>
                         </li>
 
                         <li class="flex justify-between">
                             <span>Total Jadwal</span>
                             <span class="font-semibold">
-                                {{ $mahasiswa->schedules->count() }}
+                                <?php echo e($mahasiswa->schedules->count()); ?>
+
                             </span>
                         </li>
                     </ul>
@@ -109,4 +113,5 @@
         </div>
 
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\Si-Magang\resources\views/admin/mahasiswa/show.blade.php ENDPATH**/ ?>

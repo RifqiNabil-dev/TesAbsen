@@ -34,9 +34,7 @@
                 </a>
 
                 <!-- BULK DELETE FORM -->
-                <form action="{{ route('admin.schedules.bulk-destroy') }}" method="POST"
-                    onsubmit="return confirm('Yakin ingin menghapus jadwal yang dipilih?');" class="hidden"
-                    id="bulkDeleteForm">
+                <form action="{{ route('admin.schedules.bulk-destroy') }}" method="POST" class="hidden" id="bulkDeleteForm">
                     @csrf
                     @method('DELETE')
                     <button type="submit"
@@ -58,7 +56,8 @@
                 <div>
                     <label class="text-xs font-semibold text-gray-500 mb-1 block">Peserta</label>
                     <select name="user_id"
-                        class="w-full text-sm rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500">
+                        class="w-full rounded border border-gray-300 px-3 py-2 text-sm
+                       focus:ring focus:ring-blue-200 focus:outline-none">
                         <option value="">Semua Peserta</option>
                         @foreach($usersInGroup as $u)
                             <option value="{{ $u->id }}" {{ request('user_id') == $u->id ? 'selected' : '' }}>
@@ -71,15 +70,15 @@
                 <!-- Filter Date Start -->
                 <div>
                     <label class="text-xs font-semibold text-gray-500 mb-1 block">Dari Tanggal</label>
-                    <input type="date" name="start_date" value="{{ request('start_date') }}"
-                        class="w-full text-sm rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500">
+                    <input type="text" id="start_date" name="start_date" value="{{ request('start_date') }}"
+                            class="datepicker w-full rounded border-gray-300 focus:ring-blue-500 focus:border-blue-500">
                 </div>
 
                 <!-- Filter Date End -->
                 <div>
                     <label class="text-xs font-semibold text-gray-500 mb-1 block">Sampai Tanggal</label>
-                    <input type="date" name="end_date" value="{{ request('end_date') }}"
-                        class="w-full text-sm rounded-lg border-gray-300 focus:ring-blue-500 focus:border-blue-500">
+                    <input type="text" id="end_date" name="end_date" value="{{ request('end_date') }}"
+                            class="datepicker w-full rounded border-gray-300 focus:ring-blue-500 focus:border-blue-500">
                 </div>
 
                 <div class="flex gap-2">
@@ -132,7 +131,7 @@
                                     class="schedule-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500">
                             </td>
                             <td class="px-4 py-3 font-medium text-gray-900">
-                                {{ $schedule->date->format('d-m-Y') }}
+                                {{ $schedule->date->translatedFormat('j F Y') }}
                                 <span
                                     class="text-xs text-gray-500 block font-normal">{{ $schedule->date->translatedFormat('l') }}</span>
                             </td>
@@ -159,8 +158,8 @@
                             </td>
                             <td class="px-4 py-3 text-center relative">
                                 <form action="{{ route('admin.schedules.destroy', $schedule) }}" method="POST"
-                                    onsubmit="return confirm('Hapus jadwal tanggal {{ $schedule->date->format('d-m-Y') }}?');"
-                                    class="inline-flex items-center gap-1">
+                                    data-date="{{ $schedule->date->translatedFormat('j F Y') }}"
+                                    class="delete-jadwal inline-flex items-center gap-1">
                                     @csrf
                                     @method('DELETE')
 
@@ -197,7 +196,6 @@
         </div>
     </div>
 
-    @push('scripts')
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 const checkAll = document.getElementById('checkAllHeader');
@@ -245,7 +243,83 @@
                     });
                 });
             });
+
+            document.addEventListener('submit', function (e) {
+                const form = e.target.closest('#bulkDeleteForm');
+                if (!form) return;
+
+                e.preventDefault();
+
+                const selectedCount = form.querySelectorAll('#bulkDeleteInputs input[name="ids[]"]').length;
+
+                Swal.fire({
+                    title: 'Yakin ingin menghapus?',
+                    text: `${selectedCount} jadwal yang dipilih akan dihapus dan tidak bisa dikembalikan.`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, hapus',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#dc2626', // merah
+                    cancelButtonColor: '#6b7280',  // abu (opsional)
+                    reverseButtons: true,
+                    focusCancel: true,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+
+            @if (session('success'))
+                    document.addEventListener('DOMContentLoaded', () => {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil',
+                            text: @json(session('success')),
+                            timer: 2000,
+                            showConfirmButton: false,
+                            timerProgressBar: true,
+                        });
+                    });
+            @endif
+
+            @if (session('error'))
+                    document.addEventListener('DOMContentLoaded', () => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: @json(session('error')),
+                        });
+                    });
+            @endif
+            
+            document.addEventListener('submit', function (e) {
+                const form = e.target.closest('.delete-jadwal');
+                if (!form) return;
+
+                e.preventDefault();
+
+                const date = form.dataset.date || '';
+
+                Swal.fire({
+                    title: 'Hapus jadwal?',
+                    text: date ? `Hapus jadwal tanggal ${date}? Data tidak bisa dikembalikan.` : 'Data tidak bisa dikembalikan.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, hapus',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#dc2626',
+                    cancelButtonColor: '#6b7280',
+                    reverseButtons: true,
+                    focusCancel: true,
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+
         </script>
-    @endpush
+
 
 @endsection

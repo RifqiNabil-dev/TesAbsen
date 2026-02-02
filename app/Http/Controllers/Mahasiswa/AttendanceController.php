@@ -83,21 +83,18 @@ class AttendanceController extends Controller
             if ($dist <= ($loc->radius ?? 100)) {
                 $validLocation = $loc;
                 $minDistance = $dist;
-                break; // Found a valid location, stop searching
+                break; 
             }
 
-            // Keep track of nearest just in case
             if ($dist < $minDistance) {
                 $minDistance = $dist;
                 $nearestLocation = $loc;
             }
         }
 
-        // Determine which location to use for the record
         $targetLocation = $validLocation ?? $nearestLocation;
         $distance = $minDistance;
 
-        // Safety check if something went wrong and we still don't have a location
         if (!$targetLocation) {
             return back()->with('error', 'Data lokasi tidak valid.');
         }

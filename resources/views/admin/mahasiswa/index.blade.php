@@ -3,159 +3,173 @@
 @section('title', 'Data Peserta')
 
 @section('content')
-    <div x-data="mahasiswaFilter()" class="space-y-4">
+<div x-data="mahasiswaFilter()" class="space-y-4">
 
-        <!-- HEADER -->
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-800">Data Peserta</h2>
-            <a href="{{ route('admin.mahasiswa.create') }}"
-                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
-                <i class="bi bi-plus-circle"></i> Tambah Peserta
-            </a>
-        </div>
-
-        <!-- SEARCH & FILTER -->
-        <div class="flex flex-col md:flex-row gap-3">
-            <!-- Search -->
-            <input type="text" x-model="search" placeholder="Cari nama / email..."
-                class="w-full md:w-1/3 rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200 focus:outline-none">
-
-            <!-- Filter Kelompok -->
-            <select x-model="institution"
-                class="w-full md:w-1/4 rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200 focus:outline-none">
-                <option value="">Semua Kelompok</option>
-                @foreach($mahasiswa->pluck('institution')->unique() as $inst)
-                    @if($inst)
-                        <option value="{{ strtolower($inst) }}">{{ $inst }}</option>
-                    @endif
-                @endforeach
-            </select>
-
-            <!-- Filter Periode -->
-            <select x-model="periode"
-                class="w-full md:w-1/4 rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200 focus:outline-none">
-                <option value="">Semua Periode</option>
-                <option value="aktif">Sedang Magang</option>
-                <option value="selesai">Sudah Selesai</option>
-                <option value="belum">Belum Mulai</option>
-            </select>
-        </div>
-
-        <!-- TABLE -->
-        <div class="overflow-x-auto rounded-lg border border-gray-200 bg-white">
-            <table class="w-full text-sm text-left">
-                <thead class="bg-gray-100 text-gray-700">
-                    <tr>
-                        <th class="px-4 py-3">Nama</th>
-                        <th class="px-4 py-3">Email</th>
-                        <th class="px-4 py-3">NIM</th>
-                        <th class="px-4 py-3">Kelompok</th>
-                        <th class="px-4 py-3">Periode</th>
-                        <th class="px-4 py-3 text-center">Aksi</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    @forelse($mahasiswa as $mhs)
-                        @php
-                            $start = $mhs->start_date ? \Carbon\Carbon::parse($mhs->start_date) : null;
-                            $end = $mhs->end_date ? \Carbon\Carbon::parse($mhs->end_date) : null;
-                        @endphp
-
-                        <tr class="border-t hover:bg-gray-50" x-show="filterRow($el)" data-name="{{ strtolower($mhs->name) }}"
-                            data-email="{{ strtolower($mhs->email) }}"
-                            data-institution="{{ strtolower($mhs->institution ?? '') }}" data-start="{{ $mhs->start_date }}"
-                            data-end="{{ $mhs->end_date }}">
-                            <td class="px-4 py-3 font-medium">{{ $mhs->name }}</td>
-                            <td class="px-4 py-3">{{ $mhs->email }}</td>
-                            <td class="px-4 py-3">{{ $mhs->nim ?? '-' }}</td>
-                            <td class="px-4 py-3">{{ $mhs->institution ?? '-' }}</td>
-                            <td class="px-4 py-3">
-                                @if($start && $end)
-                                    {{ $start->format('d-m-Y') }} - {{ $end->format('d-m-Y') }}
-                                @else
-                                    -
-                                @endif
-                            </td>
-                            <td class="px-4 py-3 text-center space-x-1">
-                                <a href="{{ route('admin.mahasiswa.show', $mhs) }}"
-                                    class="inline-block rounded bg-blue-500 px-2 py-1 text-white hover:bg-blue-600">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-                                <a href="{{ route('admin.mahasiswa.edit', $mhs) }}"
-                                    class="inline-block rounded bg-yellow-500 px-2 py-1 text-white hover:bg-yellow-600">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <form action="{{ route('admin.mahasiswa.destroy', $mhs) }}" method="POST" class="inline"
-                                    onsubmit="return confirm('Yakin ingin menghapus?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                Peserta
-                            </th>
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-
-        <!-- PAGINATION -->
-        <div>
-            {{ $mahasiswa->links() }}
-        </div>
+    <!-- HEADER -->
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Data Peserta</h2>
+        <a href="{{ route('admin.mahasiswa.create') }}"
+           class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
+            <i class="bi bi-plus-circle"></i> Tambah Peserta
+        </a>
     </div>
 
-    <!-- ALPINE JS -->
-    <script>
-        function mahasiswaFilter() {
-            return {
-                search: '',
-                institution: '',
-                periode: '',
+    <!-- SEARCH & FILTER -->
+    <div class="flex flex-col md:flex-row gap-3">
+        <!-- Search -->
+        <input type="text"
+               x-model="search"
+               placeholder="Cari nama / email..."
+               class="w-full md:w-1/3 rounded border border-gray-300 px-3 py-2 text-sm
+                      focus:ring focus:ring-blue-200 focus:outline-none">
 
-                filterRow(row) {
-                    const name = row.dataset.name
-                    const email = row.dataset.email
-                    const institution = row.dataset.institution
+        <!-- Filter Kelompok -->
+        <select x-model="institution"
+                class="w-full md:w-1/4 rounded border border-gray-300 px-3 py-2 text-sm
+                       focus:ring focus:ring-blue-200 focus:outline-none">
+            <option value="">Semua Kelompok</option>
+            @foreach($mahasiswa->pluck('institution')->unique() as $inst)
+                @if($inst)
+                    <option value="{{ strtolower($inst) }}">{{ $inst }}</option>
+                @endif
+            @endforeach
+        </select>
 
-                    const start = row.dataset.start
-                    const end = row.dataset.end
-                    const today = new Date().toISOString().split('T')[0]
+        <!-- Filter Periode -->
+        <select x-model="periode"
+                class="w-full md:w-1/4 rounded border border-gray-300 px-3 py-2 text-sm
+                       focus:ring focus:ring-blue-200 focus:outline-none">
+            <option value="">Semua Periode</option>
+            <option value="aktif">Sedang Magang</option>
+            <option value="selesai">Sudah Selesai</option>
+            <option value="belum">Belum Mulai</option>
+        </select>
+    </div>
 
-                    const searchMatch =
-                        name.includes(this.search.toLowerCase()) ||
-                        email.includes(this.search.toLowerCase())
+    <!-- TABLE -->
+    <div class="overflow-x-auto rounded-lg border border-gray-200 bg-white">
+        <table class="w-full text-sm text-left">
+            <thead class="bg-gray-100 text-gray-700">
+                <tr>
+                    <th class="px-4 py-3">Nama</th>
+                    <th class="px-4 py-3 text-center">Email</th>
+                    <th class="px-4 py-3 text-center">NIM</th>
+                    <th class="px-4 py-3 text-center">Kelompok</th>
+                    <th class="px-4 py-3 text-center">Periode</th>
+                    <th class="px-4 py-3 text-center">Aksi</th>
+                </tr>
+            </thead>
 
-                    const institutionMatch =
-                        this.institution === '' ||
-                        institution === this.institution
+            <tbody>
+                @forelse($mahasiswa as $mhs)
+                    @php
+                        $start = $mhs->start_date ? \Carbon\Carbon::parse($mhs->start_date) : null;
+                        $end   = $mhs->end_date ? \Carbon\Carbon::parse($mhs->end_date) : null;
+                    @endphp
 
-                    let periodeMatch = true
+                    <tr
+                        x-show="filterRow($el)"
+                        x-transition
+                        class="border-t hover:bg-gray-50"
+                        data-name="{{ strtolower($mhs->name) }}"
+                        data-email="{{ strtolower($mhs->email) }}"
+                        data-institution="{{ strtolower($mhs->institution ?? '') }}"
+                        data-start="{{ $mhs->start_date }}"
+                        data-end="{{ $mhs->end_date }}"
+                    >
+                        <td class="px-4 py-3 font-medium">{{ $mhs->name }}</td>
+                        <td class="px-4 py-3 text-center">{{ $mhs->email }}</td>
+                        <td class="px-4 py-3 text-center">{{ $mhs->nim ?? '-' }}</td>
+                        <td class="px-4 py-3 text-center">{{ $mhs->institution ?? '-' }}</td>
+                        <td class="px-4 py-3 text-center">
+                            @if($start && $end)
+                                {{ $start->translatedFormat('j F Y') }} - {{ $end->translatedFormat('j F Y')}}
+                            @else
+                                -
+                            @endif
+                        </td>
+                        <td class="px-4 py-3 text-center space-x-1">
+                            <a href="{{ route('admin.mahasiswa.show', $mhs) }}"
+                               class="inline-block rounded bg-blue-500 px-2 py-1 text-white hover:bg-blue-600">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a href="{{ route('admin.mahasiswa.edit', $mhs) }}"
+                               class="inline-block rounded bg-yellow-500 px-2 py-1 text-white hover:bg-yellow-600">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form action="{{ route('admin.mahasiswa.destroy', $mhs) }}"
+                                  method="POST"
+                                  class="inline"
+                                  onsubmit="return confirm('Yakin ingin menghapus?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit"
+                                        class="rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="px-6 py-6 text-center text-gray-500">
+                            Tidak ada data peserta ditemukan
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
 
-                    if (this.periode === 'aktif') {
-                        periodeMatch = start && end && start <= today && end >= today
-                    }
+    <!-- PAGINATION -->
+    <div>
+        {{ $mahasiswa->links() }}
+    </div>
+</div>
 
-                    if (this.periode === 'selesai') {
-                        periodeMatch = end && end < today
-                    }
+<script>
+    function mahasiswaFilter() {
+        return {
+            search: '',
+            institution: '',
+            periode: '',
 
-                    if (this.periode === 'belum') {
-                        periodeMatch = start && start > today
-                    }
+            filterRow(row) {
+                const name        = row.dataset.name ?? ''
+                const email       = row.dataset.email ?? ''
+                const institution = row.dataset.institution ?? ''
 
-                    return searchMatch && institutionMatch && periodeMatch
+                const start  = row.dataset.start
+                const end    = row.dataset.end
+                const today = new Date().toISOString().split('T')[0]
+
+                const keyword = this.search.toLowerCase()
+
+                const searchMatch =
+                    name.includes(keyword) ||
+                    email.includes(keyword)
+
+                const institutionMatch =
+                    this.institution === '' ||
+                    institution === this.institution
+
+                let periodeMatch = true
+
+                if (this.periode === 'aktif') {
+                    periodeMatch = start && end && start <= today && end >= today
                 }
+
+                if (this.periode === 'selesai') {
+                    periodeMatch = end && end < today
+                }
+
+                if (this.periode === 'belum') {
+                    periodeMatch = start && start > today
+                }
+
+                return searchMatch && institutionMatch && periodeMatch
             }
         }
-    </script>
+    }
+</script>
 @endsection

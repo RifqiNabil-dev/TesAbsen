@@ -1,35 +1,33 @@
 @extends('layouts.app')
 
-@section('title', 'Lokasi')
+@section('title', 'Daftar Division')
 
 @section('content')
-<div class="max-w-6xl mx-auto">
+<div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
-    <!-- HEADER -->
-    <div class="flex items-center justify-between mb-6">
+        <!-- HEADER -->
+    <div class="flex justify-between items-center mb-6">
         <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
-            <i class="bi bi-geo-alt"></i> Lokasi
+            <i class="bi bi-list-task"></i> Daftar Divisi
         </h2>
-
+        
         <div class="flex items-center gap-2">
-            <a href="{{ route('admin.divisions.index') }}"
+            <a href="{{ route('admin.locations.index') }}"
+                    class="inline-flex items-center gap-2 rounded bg-blue-600 px-4 py-2
+                        text-sm font-semibold text-white hover:bg-blue-700"
+                >
+                    <i class="bi bi-box-arrow-left"></i> Kembali
+                </a>
+            <a
+                href="{{ route('admin.divisions.create') }}"
                 class="inline-flex items-center gap-2 rounded bg-blue-600 px-4 py-2
                     text-sm font-semibold text-white hover:bg-blue-700"
             >
-                <i class="bi bi-eye"></i> Lihat Divisi
-            </a>
-
-            <a href="{{ route('admin.locations.create') }}"
-                class="inline-flex items-center gap-2 rounded bg-blue-600 px-4 py-2
-                    text-sm font-semibold text-white hover:bg-blue-700"
-            >
-                <i class="bi bi-plus-circle"></i> Tambah Lokasi
+                <i class="bi bi-plus-circle"></i> Tambah Divisi
             </a>
         </div>
     </div>
 
-
-    <!-- TABLE CARD -->
     <div class="bg-white rounded-lg shadow border border-gray-200">
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
@@ -37,49 +35,25 @@
                     <tr class="text-left text-gray-700">
                         <th class="px-4 py-3">Nama</th>
                         <th class="px-4 py-3">Deskripsi</th>
-                        <th class="px-4 py-3">Divisi</th> <!-- Kolom Divisi -->
-                        <th class="px-4 py-3 text-center">Koordinat</th> <!-- Kolom koordinat -->
-                        <th class="px-4 py-3">Status</th>
                         <th class="px-4 py-3 w-32 text-center">Aksi</th>
                     </tr>
                 </thead>
 
                 <tbody class="divide-y">
-                    @forelse($locations as $location)
+                    @foreach($divisions as $division)
                         <tr class="hover:bg-gray-50">
                             <td class="px-4 py-3 font-medium text-gray-800">
-                                {{ $location->name }}
+                                {{ $division->name }}
                             </td>
 
                             <td class="px-4 py-3 text-gray-600">
-                                {{ Str::limit($location->description, 50) }}
-                            </td>
-
-                            <!-- Display Division -->
-                            <td class="px-4 py-3 text-gray-600">
-                                {{ $location->division->name ?? '-' }}  <!-- Menampilkan nama division -->
-                            </td>
-
-                            <td class="px-4 py-3 text-gray-600 text-center">
-                                {{ $location->latitude }}, {{ $location->longitude }}
-                            </td>
-
-                            <td class="px-4 py-3">
-                                @if($location->is_active)
-                                    <span class="inline-block rounded bg-green-100 px-2 py-1 text-xs font-semibold text-green-700">
-                                        Aktif
-                                    </span>
-                                @else
-                                    <span class="inline-block rounded bg-gray-200 px-2 py-1 text-xs font-semibold text-gray-600">
-                                        Tidak Aktif
-                                    </span>
-                                @endif
+                                {{ Str::limit($division->description, 50) }}
                             </td>
 
                             <td class="px-4 py-3 text-center">
                                 <div class="flex items-center gap-2">
                                     <a
-                                        href="{{ route('admin.locations.edit', $location) }}"
+                                        href="{{ route('admin.divisions.edit', $division) }}"
                                         class="rounded bg-yellow-400 p-2 text-white hover:bg-yellow-500"
                                         title="Edit"
                                     >
@@ -87,7 +61,7 @@
                                     </a>
 
                                     <form
-                                        action="{{ route('admin.locations.destroy', $location) }}"
+                                        action="{{ route('admin.divisions.destroy', $division) }}"
                                         method="POST"
                                         class="delete-form"
                                     >
@@ -104,13 +78,7 @@
                                 </div>
                             </td>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="6" class="px-4 py-6 text-center text-gray-500">
-                                Tidak ada data lokasi
-                            </td>
-                        </tr>
-                    @endforelse
+                    @endforeach
                 </tbody>
             </table>
         </div>
@@ -123,8 +91,8 @@
             e.preventDefault();
 
             Swal.fire({
-                title: 'Hapus Lokasi?',
-                text: 'Data lokasi akan dihapus secara permanen.',
+                title: 'Hapus Division?',
+                text: 'Data division akan dihapus secara permanen.',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#dc2626',
@@ -139,7 +107,6 @@
         });
     });
 
-    // Alert sukses
     @if(session('success'))
         Swal.fire({
             icon: 'success',
@@ -149,7 +116,6 @@
         });
     @endif
 
-    // Alert gagal
     @if(session('error'))
         Swal.fire({
             icon: 'error',

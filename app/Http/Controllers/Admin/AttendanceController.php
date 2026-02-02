@@ -11,7 +11,6 @@ class AttendanceController extends Controller
 {
     public function index(Request $request)
     {
-        // View Detail Per User (if user_id is present)
         if ($request->filled('user_id')) {
             $query = Attendance::where('user_id', $request->user_id)
                 ->with(['user', 'location']);
@@ -26,9 +25,7 @@ class AttendanceController extends Controller
             return view('admin.attendance.detail', compact('attendances', 'selectedUser'));
         }
 
-        // View Summary List (Group by User) - Default
-        // Logic: Get Users with role mahasiswa and count their stats
-        // To be simpler, we just pass the users list, and stats can be calculated or just simple list
+
         $query = User::where('role', 'mahasiswa');
 
         if ($request->filled('search')) {
@@ -49,6 +46,15 @@ class AttendanceController extends Controller
     {
         $attendance->load(['user', 'location']);
         return view('admin.attendance.show', compact('attendance'));
+    }
+
+    public function updateStatus(Request $request, $attendanceId)
+    {
+        $attendance = Attendance::findOrFail($attendanceId);
+        $attendance->status = $request->status;
+        $attendance->save();
+
+        return redirect()->route('admin.attendance.show', $attendance->id)->with('success', 'Status berhasil diperbarui.');
     }
 
 

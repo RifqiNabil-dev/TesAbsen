@@ -7,7 +7,7 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
         <h2 class="text-xl sm:text-2xl font-semibold flex items-center gap-2">
-            <i class="bi bi-speedometer2"></i> Dashboard
+            <i class="bi bi-house-door text-blue-600"></i> Dashboard
         </h2>
     </div>
 
@@ -229,14 +229,52 @@
 
     </div>
 
-    {{-- Dummy function biar tidak error --}}
+        <!-- Page Preview Absensi -->
+    <div id="attendanceModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+
+        <div class="bg-white rounded-lg w-full max-w-xl mx-4">
+            <div class="px-4 py-3 border-b flex justify-between items-center">
+                <h3 class="font-semibold text-lg">Preview Lokasi Absensi</h3>
+                <button onclick="closeAttendancePreview()"><i class="bi bi-x-circle" style="color: red;"></i></button>
+            </div>
+
+            <div class="p-4 space-y-3">
+                <div id="mapPreview" class="w-full h-64 rounded"></div>
+                <div id="statusBox" class="hidden">
+                    <p class="font-semibold" id="statusTitle"></p>
+                    <p class="text-xs mt-1" id="statusDesc"></p>
+                </div>
+                <p class="text-sm text-gray-600">
+                    Pastikan lokasi kamu sudah benar sebelum konfirmasi absensi.
+                </p>
+
+                <form method="POST" action="{{ route('mahasiswa.attendance.checkin') }}">
+                    @csrf
+                    <input type="hidden" name="latitude" id="latitude">
+                    <input type="hidden" name="longitude" id="longitude">
+
+                    <div class="flex justify-end gap-2">
+                        <button type="button" onclick="closeAttendancePreview()" class="px-4 py-2 rounded bg-gray-300">
+                            Batal
+                        </button>
+
+                        <button type="submit" onclick="closeAttendancePreview()" class="px-4 py-2 rounded bg-blue-600 text-white">
+                            Konfirmasi Absen
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
     <script>
         let map, marker;
-        // Pass PHP data to JS
+
         const locations = @json($todaySchedule ? $todaySchedule->locations : []);
 
         function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371000; // meters
+            const R = 6371000;
             const dLat = (lat2 - lat1) * Math.PI / 180;
             const dLon = (lon2 - lon1) * Math.PI / 180;
             const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
@@ -246,9 +284,48 @@
             return R * c;
         }
 
+        function showModal() {
+            const modal = document.getElementById('attendanceModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeAttendancePreview() {
+            const modal = document.getElementById('attendanceModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        function setStatusBox({ outside, distanceInt, radius, nearestName }) {
+            const box = document.getElementById('statusBox');
+            const titleEl = document.getElementById('statusTitle');
+            const descEl = document.getElementById('statusDesc');
+
+            if (distanceInt == null) {
+                box.classList.add('hidden');
+                return;
+            }
+
+            box.classList.remove('hidden');
+
+            if (outside) {
+                box.className = "rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800";
+                titleEl.textContent = "Di luar area lokasi";
+                descEl.textContent =
+                    `Jarak ke lokasi terdekat: ${distanceInt}m (radius: ${radius}M)${nearestName ? " • " + nearestName : ""}. ` +
+                    `Absensi akan tercatat sebagai "Diluar Area Lokasi".`;
+            } else {
+                box.className = "rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800";
+                titleEl.textContent = "Dalam area lokasi";
+                descEl.textContent =
+                    `Jarak ke lokasi terdekat: ${distanceInt}m (radius: ${radius}m)${nearestName ? " • " + nearestName : ""}.`;
+            }
+        }
+
         function openAttendancePreview() {
             if (!navigator.geolocation) {
-                alert('Browser tidak mendukung GPS');
+                setStatusBox({ outside: false, distanceInt: null, radius: null, nearestName: null });
+                showModal();
                 return;
             }
 
@@ -259,33 +336,34 @@
                 document.getElementById('latitude').value = lat;
                 document.getElementById('longitude').value = lng;
 
-                // Check distance
                 if (locations.length > 0) {
                     let minDistance = Infinity;
                     let nearestRadius = 100;
+                    let nearestName = null;
 
                     locations.forEach(loc => {
                         const dist = calculateDistance(lat, lng, loc.latitude, loc.longitude);
                         if (dist < minDistance) {
                             minDistance = dist;
                             nearestRadius = loc.radius || 100;
+                            nearestName = loc.name || null;
                         }
                     });
 
-                    // Warn if outside
                     const distanceInt = Math.round(minDistance);
-                    if (minDistance > nearestRadius) {
-                        const confirmMsg = `Anda berada di luar area lokasi (Jarak: ${distanceInt}m). Absensi akan tercatat sebagai "Diluar Area Lokasi". Lanjutkan?`;
-                        if (!confirm(confirmMsg)) {
-                            return; // Stop if user cancels
-                        }
-                    }
+                    const outside = minDistance > nearestRadius;
+
+                    setStatusBox({
+                        outside,
+                        distanceInt,
+                        radius: nearestRadius,
+                        nearestName
+                    });
+                } else {
+                    setStatusBox({ outside: false, distanceInt: null, radius: null, nearestName: null });
                 }
 
-                // Show Modal if proceeded
-                document.getElementById('attendanceModal').classList.remove('hidden');
-                document.getElementById('attendanceModal').classList.add('flex');
-
+                showModal();
                 setTimeout(() => {
                     if (!map) {
                         map = L.map('mapPreview').setView([lat, lng], 17);
@@ -301,52 +379,59 @@
                         map.setView([lat, lng], 17);
                         marker.setLatLng([lat, lng]);
                     }
+
+                    map.invalidateSize();
                 }, 300);
 
             }, () => {
-                alert('Gagal mengambil lokasi. Pastikan GPS aktif.');
+                setStatusBox({
+                    outside: true,
+                    distanceInt: null,
+                    radius: null,
+                    nearestName: null
+                });
+
+                showModal();
+
+                const box = document.getElementById('statusBox');
+                box.className = "rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800";
+                document.getElementById('statusTitle').textContent = "Gagal mengambil lokasi";
+                document.getElementById('statusDesc').textContent = "Pastikan GPS aktif dan izin lokasi browser sudah diizinkan, lalu coba lagi.";
+                box.classList.remove('hidden');
             });
         }
 
-        function closeAttendancePreview() {
-            document.getElementById('attendanceModal').classList.add('hidden');
-        }
+        @if (session('success') || session('warning') || session('error'))
+                document.addEventListener('DOMContentLoaded', () => {
+                    let icon = 'info';
+                    let title = 'Info';
+                    let text = '';
+
+                    @if (session('success'))
+                        icon = 'success';
+                        title = 'Berhasil';
+                        text = @json(session('success'));
+                    @elseif (session('warning'))
+                        icon = 'warning';
+                        title = 'Perhatian';
+                        text = @json(session('warning'));
+                    @elseif (session('error'))
+                        icon = 'error';
+                        title = 'Gagal';
+                        text = @json(session('error'));
+                    @endif
+
+                    Swal.fire({
+                        icon,
+                        title,
+                        text,
+                        timer: 2500,
+                        showConfirmButton: false,
+                        timerProgressBar: true,
+                    });
+                });
+        @endif
+
     </script>
-
-
-    <!-- MODAL PREVIEW ABSENSI -->
-    <div id="attendanceModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
-
-        <div class="bg-white rounded-lg w-full max-w-xl mx-4">
-            <div class="px-4 py-3 border-b flex justify-between items-center">
-                <h3 class="font-semibold text-lg">Preview Lokasi Absensi</h3>
-                <button onclick="closeAttendancePreview()" class="text-gray-500">&times;</button>
-            </div>
-
-            <div class="p-4 space-y-3">
-                <div id="mapPreview" class="w-full h-64 rounded"></div>
-
-                <p class="text-sm text-gray-600">
-                    Pastikan lokasi kamu sudah benar sebelum konfirmasi absensi.
-                </p>
-
-                <form method="POST" action="{{ route('mahasiswa.attendance.checkin') }}">
-                    @csrf
-                    <input type="hidden" name="latitude" id="latitude">
-                    <input type="hidden" name="longitude" id="longitude">
-
-                    <div class="flex justify-end gap-2">
-                        <button type="button" onclick="closeAttendancePreview()" class="px-4 py-2 rounded bg-gray-300">
-                            Batal
-                        </button>
-
-                        <button type="submit" class="px-4 py-2 rounded bg-blue-600 text-white">
-                            Konfirmasi Absen
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 
 @endsection

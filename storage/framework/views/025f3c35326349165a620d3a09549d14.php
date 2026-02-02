@@ -43,7 +43,7 @@
                     <?php $__empty_1 = true; $__currentLoopData = $attendances; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attendance): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                         <tr class="hover:bg-gray-50">
                             <td class="px-4 py-3 font-medium text-gray-900">
-                                <?php echo e($attendance->date?->format('d-m-Y') ?? '-'); ?>
+                                <?php echo e($attendance->date?->translatedFormat('j F Y') ?? '-'); ?>
 
                             </td>
                             <td class="px-4 py-3 text-gray-600">

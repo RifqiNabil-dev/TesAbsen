@@ -35,20 +35,20 @@
                                focus:ring focus:ring-blue-200 focus:border-blue-500">{{ old('description') }}</textarea>
                 </div>
 
-
-                <!-- Search Box (New Feature) -->
-                <div class="mb-2 relative z-[1000]">
-                    <div class="flex gap-2">
-                        <input type="text" id="searchLocation" placeholder="Cari nama lokasi (misal: Perpustakaan)"
-                            class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200 focus:border-blue-500">
-                        <button type="button" id="btnSearch"
-                            class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">
-                            Cari
-                        </button>
-                    </div>
-                    <ul id="searchResults"
-                        class="hidden absolute left-0 right-0 bg-white border border-gray-200 mt-1 max-h-48 overflow-y-auto z-50 rounded shadow-lg">
-                    </ul>
+                <!-- PILIH DIVISI -->
+                <div class="mb-4">
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">
+                        Pilih Divisi <span class="text-red-500">*</span>
+                    </label>
+                    <select name="division_id" required class="w-full rounded border border-gray-300 px-3 py-2 text-sm
+                               focus:ring focus:ring-blue-200 focus:border-blue-500">
+                        <option value="" disabled selected>Pilih Divisi</option>
+                        @foreach($divisions as $division)
+                            <option value="{{ $division->id }}" {{ old('division_id') == $division->id ? 'selected' : '' }}>
+                                {{ $division->name }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
 
                 <!-- MAP -->
@@ -147,7 +147,7 @@
                     map.setView([lat, lng], 16);
                 }
 
-                // default marker initialization
+                // default marker
                 updateMap(defaultLat, defaultLng, document.getElementById('radius').value);
                 document.getElementById('latitude').value = defaultLat.toFixed(7);
                 document.getElementById('longitude').value = defaultLng.toFixed(7);
@@ -172,71 +172,7 @@
                         updateMap(lat, lng, this.value);
                     }
                 });
-
-                // --- SEARCH FEATURE ---
-                const btnSearch = document.getElementById('btnSearch');
-                const searchInput = document.getElementById('searchLocation');
-                const searchResults = document.getElementById('searchResults');
-
-                btnSearch.addEventListener('click', function () {
-                    const query = searchInput.value;
-                    if (!query) return;
-
-                    fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=5&q=${query}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            searchResults.innerHTML = '';
-                            searchResults.classList.remove('hidden');
-
-                            if (data.length === 0) {
-                                const li = document.createElement('li');
-                                li.className = 'px-3 py-2 text-sm text-gray-500';
-                                li.textContent = 'Lokasi tidak ditemukan';
-                                searchResults.appendChild(li);
-                                return;
-                            }
-
-                            data.forEach(place => {
-                                const li = document.createElement('li');
-                                li.className = 'px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer border-b last:border-0';
-                                li.textContent = place.display_name;
-                                li.onclick = function () {
-                                    const lat = parseFloat(place.lat);
-                                    const lon = parseFloat(place.lon);
-                                    const radius = document.getElementById('radius').value;
-
-                                    document.getElementById('latitude').value = lat.toFixed(7);
-                                    document.getElementById('longitude').value = lon.toFixed(7);
-
-                                    updateMap(lat, lon, radius);
-                                    searchResults.classList.add('hidden');
-                                };
-                                searchResults.appendChild(li);
-                            });
-                        })
-                        .catch(err => {
-                            console.error(err);
-                            alert('Gagal mencari lokasi. Silakan coba lagi.');
-                        });
-                });
-
-                // Allow Enter key to search
-                searchInput.addEventListener('keypress', function (e) {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        btnSearch.click();
-                    }
-                });
-
-                // Close results when clicking outside
-                document.addEventListener('click', function (e) {
-                    if (!searchResults.contains(e.target) && e.target !== searchInput && e.target !== btnSearch) {
-                        searchResults.classList.add('hidden');
-                    }
-                });
-
             </script>
-
 
         </div>
     </div>

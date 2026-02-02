@@ -87,18 +87,16 @@
                         <label class="block text-sm font-semibold mb-1">
                             Tanggal Mulai
                         </label>
-                        <input type="date" name="start_date"
-                            value="{{ old('start_date', $mahasiswa->start_date ? \Carbon\Carbon::parse($mahasiswa->start_date)->format('Y-m-d') : '') }}"
-                            class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200">
+                        <input type="text" id="start_date" name="start_date" value="{{ old('start_date', $mahasiswa->start_date ? \Carbon\Carbon::parse($mahasiswa->start_date)->format('Y-m-d') : '') }}"
+                                class="datepicker w-full rounded border-gray-300 focus:ring-blue-500 focus:border-blue-500">
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold mb-1">
                             Tanggal Selesai
                         </label>
-                        <input type="date" name="end_date"
-                            value="{{ old('end_date', $mahasiswa->end_date ? \Carbon\Carbon::parse($mahasiswa->end_date)->format('Y-m-d') : '') }}"
-                            class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200">
+                        <input type="text" id="end_date" name="end_date" value="{{ old('end_date', $mahasiswa->end_date ? \Carbon\Carbon::parse($mahasiswa->end_date)->format('Y-m-d') : '') }}"
+                            class="datepicker w-full rounded border-gray-300 focus:ring-blue-500 focus:border-blue-500">
                     </div>
                 </div>
 

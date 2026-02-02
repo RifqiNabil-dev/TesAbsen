@@ -8,7 +8,7 @@
     <!-- HEADER -->
     <div class="border-b px-6 py-4">
         <h2 class="text-lg font-semibold text-gray-800">
-            ➕ Tambah Jadwal
+            Tambah Jadwal
         </h2>
     </div>
 

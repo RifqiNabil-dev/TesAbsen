@@ -7,7 +7,7 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
         <h2 class="text-xl sm:text-2xl font-semibold flex items-center gap-2">
-            <i class="bi bi-journal-text"></i> Logbook
+            <i class="bi bi-journal-text text-blue-600"></i> Logbook
         </h2>
 
         <a href="{{ route('mahasiswa.logbooks.create') }}" class="inline-flex items-center justify-center gap-2
@@ -24,8 +24,8 @@
 
             <!-- Table -->
             <div class="overflow-x-auto">
-                <table class="min-w-full text-sm border border-gray-200 rounded-lg">
-                    <thead class="bg-gray-100">
+                <table class="min-w-full text-sm border border-gray-600 rounded-lg">
+                    <thead class=" border bg-gray-100">
                         <tr>
                             <th class="p-3 text-left">Tanggal</th>
                             <th class="p-3 text-left">Aktivitas</th>
@@ -79,8 +79,7 @@
                                                 <i class="bi bi-pencil"></i>
                                             </a>
 
-                                            <form action="{{ route('mahasiswa.logbooks.destroy', $logbook) }}" method="POST"
-                                                onsubmit="return confirm('Yakin ingin menghapus?')">
+                                            <form action="{{ route('mahasiswa.logbooks.destroy', $logbook) }}" method="POST" class="delete-logbook">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="bg-red-500 hover:bg-red-600 text-white
@@ -110,5 +109,31 @@
 
         </div>
     </div>
+
+<script>
+    document.addEventListener('submit', function (e) {
+        const form = e.target.closest('.delete-logbook');
+        if (!form) return;
+
+        e.preventDefault();
+
+        Swal.fire({
+            title: 'Yakin ingin menghapus?',
+            text: 'Data logbook yang dihapus tidak bisa dikembalikan.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, hapus',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#6b7280',
+            reverseButtons: true,
+            focusCancel: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    });
+</script>
 
 @endsection

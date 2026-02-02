@@ -22,7 +22,7 @@
             <!-- MAHASISWA SEARCH -->
             <div class="mb-5">
                 <label class="block text-sm font-semibold mb-1">
-                    Mahasiswa <span class="text-red-500">*</span>
+                    Peserta <span class="text-red-500">*</span>
                 </label>
 
                 <!-- SEARCH BAR -->
@@ -88,27 +88,35 @@ unset($__errorArgs, $__bag); ?>
             <!-- LOKASI -->
             <div class="mb-4">
                 <label class="block text-sm font-semibold mb-1">
-                    Lokasi <span class="text-red-500">*</span>
+                    Lokasi (Pilih 1-3) <span class="text-red-500">*</span>
                 </label>
-                <select
-                    name="location_id"
-                    required
-                    class="w-full rounded border border-gray-300 px-3 py-2 text-sm
-                           focus:ring focus:ring-blue-200"
-                >
-                    <option value="">Pilih Lokasi</option>
-                    <?php $__currentLoopData = $locations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $location): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                        <option
-                            value="<?php echo e($location->id); ?>"
-                            <?php echo e(old('location_id', $schedule->location_id) == $location->id ? 'selected' : ''); ?>
+                
+                <div class="border rounded p-3 max-h-[300px] overflow-y-auto space-y-4">
+                    <?php $__currentLoopData = $locations->groupBy('division.name'); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $divisionName => $divLocations): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                        <div>
+                            <h4 class="font-bold text-xs uppercase text-gray-500 mb-2 border-b pb-1">
+                                <?php echo e($divisionName ?? 'Lainnya'); ?>
 
-                        >
-                            <?php echo e($location->name); ?>
+                            </h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                <?php $__currentLoopData = $divLocations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $location): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <label class="flex items-center space-x-2 text-sm cursor-pointer p-1 hover:bg-gray-50 rounded">
+                                        <input 
+                                            type="checkbox" 
+                                            name="location_ids[]" 
+                                            value="<?php echo e($location->id); ?>"
+                                            class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                            <?php echo e(in_array($location->id, old('location_ids', $schedule->locations->pluck('id')->toArray())) ? 'checked' : ''); ?>
 
-                        </option>
+                                        >
+                                        <span class="text-gray-700"><?php echo e($location->name); ?></span>
+                                    </label>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </div>
+                        </div>
                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                </select>
-                <?php $__errorArgs = ['location_id'];
+                </div>
+                <?php $__errorArgs = ['location_ids'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }

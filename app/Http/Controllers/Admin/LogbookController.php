@@ -10,7 +10,7 @@ class LogbookController extends Controller
 {
     public function index(Request $request)
     {
-        // View Detail Per User (if user_id is present)
+
         if ($request->filled('user_id')) {
             $query = Logbook::with('user');
 
@@ -28,7 +28,7 @@ class LogbookController extends Controller
             return view('admin.logbooks.detail', compact('logbooks', 'selectedUser'));
         }
 
-        // View Summary List (Group by User)
+
         $query = \App\Models\User::where('role', 'mahasiswa');
 
         if ($request->filled('search')) {

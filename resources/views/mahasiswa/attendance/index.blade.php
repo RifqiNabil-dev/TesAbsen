@@ -7,7 +7,7 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
         <h2 class="text-xl sm:text-2xl font-semibold flex items-center gap-2">
-            <i class="bi bi-clock-history"></i> Presensi
+            <i class="bi bi-clock-history text-blue-600"></i> Presensi
         </h2>
     </div>
 

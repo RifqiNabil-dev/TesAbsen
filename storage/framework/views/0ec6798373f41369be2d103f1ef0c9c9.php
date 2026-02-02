@@ -69,7 +69,7 @@
         <div>JADWAL PKL UNIVERSITAS BRAWIJAYA MALANG</div>
         <div>BIDANG LAYANAN DAN PENGEMBANGAN PERPUSTAKAAN</div>
         <div style="text-transform: none; margin-top: 5px;">
-            Tanggal <?php echo e($startDate->format('d-m-Y')); ?> - <?php echo e($endDate->format('d-m-Y')); ?>
+            Tanggal <?php echo e($startDate->translatedFormat('j F Y')); ?> - <?php echo e($endDate->translatedFormat('j F Y')); ?>
 
         </div>
         <div style="text-transform: none;">(<?php echo e($group->name); ?>)</div>
@@ -99,7 +99,7 @@
                         
                         <td class="text-center">
                             
-                                <?php echo e($row['start']->format('d-m-Y')); ?> - <?php echo e($row['end']->format('d-m-Y')); ?>
+                                <?php echo e($row['start']->translatedFormat('j F Y')); ?> - <br> <?php echo e($row['end']->translatedFormat('j F Y')); ?>
 
 
                         </td>
@@ -114,7 +114,7 @@
     </table>
 
     <div class="footer">
-        <div>Malang, <?php echo e(now()->format('d-m-Y')); ?></div>
+        <div>Malang, <?php echo e(now()->translatedFormat('j F Y')); ?></div>
         <div>Kepala Bidang Layanan dan Pengembangan Perpustakaan</div>
         <br><br><br><br>
         <div style="font-weight: bold; text-decoration: underline; text-transform: uppercase;">LINDA DESRIWATI, SKM</div>

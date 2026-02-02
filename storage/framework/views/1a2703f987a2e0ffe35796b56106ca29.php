@@ -99,16 +99,16 @@ unset($__errorArgs, $__bag); ?>
                         <label class="block text-sm font-semibold mb-1">
                             Tanggal Mulai
                         </label>
-                        <input type="date" name="start_date" value="<?php echo e(old('start_date')); ?>"
-                            class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200">
+                    <input type="text" id="start_date" name="start_date" value="<?php echo e(request('start_date')); ?>"
+                            class="datepicker w-full rounded border-gray-300 focus:ring-blue-500 focus:border-blue-500">
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold mb-1">
                             Tanggal Selesai
                         </label>
-                        <input type="date" name="end_date" value="<?php echo e(old('end_date')); ?>"
-                            class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200">
+                    <input type="text" id="end_date" name="end_date" value="<?php echo e(request('end_date')); ?>"
+                            class="datepicker w-full rounded border-gray-300 focus:ring-blue-500 focus:border-blue-500">
                     </div>
                 </div>
 

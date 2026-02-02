@@ -43,7 +43,7 @@
                     @forelse($attendances as $attendance)
                         <tr class="hover:bg-gray-50">
                             <td class="px-4 py-3 font-medium text-gray-900">
-                                {{ $attendance->date?->format('d-m-Y') ?? '-' }}
+                                {{ $attendance->date?->translatedFormat('j F Y') ?? '-' }}
                             </td>
                             <td class="px-4 py-3 text-gray-600">
                                 @php

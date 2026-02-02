@@ -124,24 +124,16 @@
                 @endforelse
             </div>
 
-            <p class="text-xs text-gray-500 mt-2">
-                Centang mahasiswa yang ingin menjadi anggota kelompok ini.
-                Peserta dari kelompok lain akan otomatis dipindahkan.
-            </p>
-
             <!-- ACTION -->
             <div class="flex justify-between items-center mt-6">
-                <a
-                    href="{{ route('admin.groups.index') }}"
-                    class="rounded bg-gray-500 px-4 py-2 text-sm text-white hover:bg-gray-600"
-                >
+                <a href="javascript:void(0);" onclick="window.history.back();"
+                    class="rounded bg-gray-500 px-4 py-2 text-sm text-white hover:bg-gray-600">
                     Batal
                 </a>
 
                 <button
                     type="submit"
-                    class="rounded bg-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-700"
-                >
+                    class="rounded bg-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-700">
                     Simpan Perubahan
                 </button>
             </div>
