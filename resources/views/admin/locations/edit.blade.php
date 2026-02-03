@@ -62,13 +62,13 @@
                 </select>
             </div>
 
-            <!-- Search Box (New Feature) -->
+            <!-- Search Box -->
             <div class="mb-2 relative z-[1000]">
                 <div class="flex gap-2">
                     <input type="text" id="searchLocation" placeholder="Cari nama lokasi (misal: Perpustakaan)" 
                         class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200 focus:border-blue-500">
                     <button type="button" id="btnSearch" class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">
-                        Cari
+                            Cari
                     </button>
                 </div>
                 <ul id="searchResults" class="hidden absolute left-0 right-0 bg-white border border-gray-200 mt-1 max-h-48 overflow-y-auto z-50 rounded shadow-lg"></ul>
@@ -172,63 +172,98 @@
             </div>
         </form>
 
-        <script>
-            const defaultLat = {{ old('latitude', $location->latitude) ?? -7.9721340 }};
-            const defaultLng = {{ old('longitude', $location->longitude) ?? 112.6221959 }};
-            const defaultRadius = {{ old('radius', $location->radius) ?? 50 }};
-            
-            const map = L.map('map').setView([defaultLat, defaultLng], 16);
+            <script>
+                const defaultLat = -7.9721340;
+                const defaultLng = 112.6221959;
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(map);
+                const map = L.map('map').setView([defaultLat, defaultLng], 16);
 
-            let marker;
-            let radiusCircle;
-
-            function updateMap(lat, lng, radius) {
-                if (marker) map.removeLayer(marker);
-                if (radiusCircle) map.removeLayer(radiusCircle);
-
-                marker = L.marker([lat, lng]).addTo(map)
-                    .bindPopup('Titik lokasi absensi')
-                    .openPopup();
-
-                radiusCircle = L.circle([lat, lng], {
-                    radius: radius,
-                    color: 'blue',
-                    fillOpacity: 0.2
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; OpenStreetMap contributors'
                 }).addTo(map);
-                
-                map.setView([lat, lng], 16);
-            }
 
-            // default marker
-            updateMap(defaultLat, defaultLng, defaultRadius);
-            document.getElementById('latitude').value = defaultLat.toFixed(7);
-            document.getElementById('longitude').value = defaultLng.toFixed(7);
+                let marker;
+                let radiusCircle;
 
-            map.on('click', function (e) {
-                const lat = e.latlng.lat.toFixed(7);
-                const lng = e.latlng.lng.toFixed(7);
-                const radius = document.getElementById('radius').value;
+                function updateMap(lat, lng, radius) {
+                    if (marker) map.removeLayer(marker);
+                    if (radiusCircle) map.removeLayer(radiusCircle);
 
-                document.getElementById('latitude').value = lat;
-                document.getElementById('longitude').value = lng;
+                    marker = L.marker([lat, lng]).addTo(map)
+                        .bindPopup('Titik lokasi absensi')
+                        .openPopup();
 
-                updateMap(lat, lng, radius);
-            });
+                    radiusCircle = L.circle([lat, lng], {
+                        radius: radius,
+                        color: 'blue',
+                        fillOpacity: 0.2
+                    }).addTo(map);
 
-            // Update radius realtime
-            document.getElementById('radius').addEventListener('input', function () {
-                const lat = document.getElementById('latitude').value;
-                const lng = document.getElementById('longitude').value;
-
-                if (lat && lng) {
-                    updateMap(lat, lng, this.value);
+                    map.setView([lat, lng], 16);
                 }
-            });
-        </script>
+
+                updateMap(defaultLat, defaultLng, document.getElementById('radius').value);
+                document.getElementById('latitude').value = defaultLat.toFixed(7);
+                document.getElementById('longitude').value = defaultLng.toFixed(7);
+
+                map.on('click', function (e) {
+                    const lat = e.latlng.lat.toFixed(7);
+                    const lng = e.latlng.lng.toFixed(7);
+                    const radius = document.getElementById('radius').value;
+
+                    document.getElementById('latitude').value = lat;
+                    document.getElementById('longitude').value = lng;
+
+                    updateMap(lat, lng, radius);
+                });
+
+                document.getElementById('radius').addEventListener('input', function () {
+                    const lat = document.getElementById('latitude').value;
+                    const lng = document.getElementById('longitude').value;
+
+                    if (lat && lng) {
+                        updateMap(lat, lng, this.value);
+                    }
+                });
+
+                // Search
+                const searchButton = document.getElementById('btnSearch');
+                const searchInput = document.getElementById('searchLocation');
+                const searchResults = document.getElementById('searchResults');
+
+                searchButton.addEventListener('click', function () {
+                    const query = searchInput.value.trim();
+                    if (query) {
+                        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                searchResults.innerHTML = '';
+                                data.forEach(location => {
+                                    const listItem = document.createElement('li');
+                                    listItem.textContent = location.display_name;
+                                    listItem.classList.add('px-4', 'py-2', 'cursor-pointer');
+                                    listItem.addEventListener('click', function () {
+                                        const lat = parseFloat(location.lat);
+                                        const lon = parseFloat(location.lon);
+                                        document.getElementById('latitude').value = lat.toFixed(7);
+                                        document.getElementById('longitude').value = lon.toFixed(7);
+                                        updateMap(lat, lon, document.getElementById('radius').value);
+                                        searchResults.classList.add('hidden');
+                                    });
+                                    searchResults.appendChild(listItem);
+                                });
+                                searchResults.classList.remove('hidden');
+                            })
+                            .catch(error => console.error('Error fetching location data:', error));
+                    }
+                });
+
+                searchInput.addEventListener('input', function () {
+                    if (searchInput.value.trim() === '') {
+                        searchResults.classList.add('hidden');
+                    }
+                });
+            </script>
     </div>
 </div>
 @endsection

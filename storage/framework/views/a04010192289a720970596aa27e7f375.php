@@ -52,6 +52,18 @@
                     </select>
                 </div>
 
+                <!-- Search Box -->
+                <div class="mb-2 relative z-[1000]">
+                    <div class="flex gap-2">
+                        <input type="text" id="searchLocation" placeholder="Cari nama lokasi (misal: Perpustakaan)" 
+                            class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:ring focus:ring-blue-200 focus:border-blue-500">
+                        <button type="button" id="btnSearch" class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">
+                            Cari
+                        </button>
+                    </div>
+                    <ul id="searchResults" class="hidden absolute left-0 right-0 bg-white border border-gray-200 mt-1 max-h-48 overflow-y-auto z-50 rounded shadow-lg"></ul>
+                </div>
+
                 <!-- MAP -->
                 <div class="mb-4">
                     <label class="block text-sm font-semibold text-gray-700 mb-2">
@@ -149,7 +161,6 @@
                     map.setView([lat, lng], 16);
                 }
 
-                // default marker
                 updateMap(defaultLat, defaultLng, document.getElementById('radius').value);
                 document.getElementById('latitude').value = defaultLat.toFixed(7);
                 document.getElementById('longitude').value = defaultLng.toFixed(7);
@@ -165,7 +176,6 @@
                     updateMap(lat, lng, radius);
                 });
 
-                // Update radius realtime
                 document.getElementById('radius').addEventListener('input', function () {
                     const lat = document.getElementById('latitude').value;
                     const lng = document.getElementById('longitude').value;
@@ -174,9 +184,48 @@
                         updateMap(lat, lng, this.value);
                     }
                 });
+
+                // Search
+                const searchButton = document.getElementById('btnSearch');
+                const searchInput = document.getElementById('searchLocation');
+                const searchResults = document.getElementById('searchResults');
+
+                searchButton.addEventListener('click', function () {
+                    const query = searchInput.value.trim();
+                    if (query) {
+                        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                searchResults.innerHTML = '';
+                                data.forEach(location => {
+                                    const listItem = document.createElement('li');
+                                    listItem.textContent = location.display_name;
+                                    listItem.classList.add('px-4', 'py-2', 'cursor-pointer');
+                                    listItem.addEventListener('click', function () {
+                                        const lat = parseFloat(location.lat);
+                                        const lon = parseFloat(location.lon);
+                                        document.getElementById('latitude').value = lat.toFixed(7);
+                                        document.getElementById('longitude').value = lon.toFixed(7);
+                                        updateMap(lat, lon, document.getElementById('radius').value);
+                                        searchResults.classList.add('hidden');
+                                    });
+                                    searchResults.appendChild(listItem);
+                                });
+                                searchResults.classList.remove('hidden');
+                            })
+                            .catch(error => console.error('Error fetching location data:', error));
+                    }
+                });
+
+                searchInput.addEventListener('input', function () {
+                    if (searchInput.value.trim() === '') {
+                        searchResults.classList.add('hidden');
+                    }
+                });
             </script>
 
         </div>
     </div>
 <?php $__env->stopSection(); ?>
+
 <?php echo $__env->make('layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH C:\xampp\htdocs\Si-Magang\resources\views/admin/locations/create.blade.php ENDPATH**/ ?>
