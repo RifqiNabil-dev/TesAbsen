@@ -39,6 +39,16 @@
                             class="my-3 w-full bg-transparent outline-none text-gray-700 placeholder-gray-400"
                             placeholder="Alamat Email">
                     </div>
+                    <?php $__errorArgs = ['email'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                        <span class="text-red-500 text-sm text-left block w-full mt-1 pl-1"><?php echo e($message); ?></span>
+                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
 
                     <div
                         class="flex w-full items-center space-x-2 rounded-2xl bg-gray-50 px-4 ring-2 ring-gray-200 focus-within:ring-blue-500 transition-all duration-300">
@@ -46,6 +56,16 @@
                             class="my-3 w-full bg-transparent outline-none text-gray-700 placeholder-gray-400"
                             placeholder="Kata Sandi">
                     </div>
+                    <?php $__errorArgs = ['password'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                        <span class="text-red-500 text-sm text-left block w-full mt-1 pl-1"><?php echo e($message); ?></span>
+                    <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
 
                     <button type="submit"
                         class="w-full rounded-2xl border-b-4 border-b-blue-600 bg-blue-600 py-3 font-bold text-white shadow-lg hover:bg-blue-700 hover:border-b-blue-700 active:border-b-0 active:translate-y-1 transition-all duration-200">

@@ -23,7 +23,7 @@ class AuthenticatedSessionController extends Controller
 
         if (!Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
             throw ValidationException::withMessages([
-                'email' => __('The provided credentials do not match our records.'),
+                'email' => __('Alamat email atau password yang Anda masukkan salah.'),
             ]);
         }
 
