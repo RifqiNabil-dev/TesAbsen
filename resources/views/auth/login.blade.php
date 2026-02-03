@@ -39,6 +39,9 @@
                             class="my-3 w-full bg-transparent outline-none text-gray-700 placeholder-gray-400"
                             placeholder="Alamat Email">
                     </div>
+                    @error('email')
+                        <span class="text-red-500 text-sm text-left block w-full mt-1 pl-1">{{ $message }}</span>
+                    @enderror
 
                     <div
                         class="flex w-full items-center space-x-2 rounded-2xl bg-gray-50 px-4 ring-2 ring-gray-200 focus-within:ring-blue-500 transition-all duration-300">
@@ -46,6 +49,9 @@
                             class="my-3 w-full bg-transparent outline-none text-gray-700 placeholder-gray-400"
                             placeholder="Kata Sandi">
                     </div>
+                    @error('password')
+                        <span class="text-red-500 text-sm text-left block w-full mt-1 pl-1">{{ $message }}</span>
+                    @enderror
 
                     <button type="submit"
                         class="w-full rounded-2xl border-b-4 border-b-blue-600 bg-blue-600 py-3 font-bold text-white shadow-lg hover:bg-blue-700 hover:border-b-blue-700 active:border-b-0 active:translate-y-1 transition-all duration-200">

@@ -36,7 +36,7 @@
         th { 
             text-align: center; 
             font-weight: bold;
-            background-color: #fff; /* Ensure white background for print if needed */
+            background-color: #fff; 
         }
         .text-center { text-align: center; }
         
@@ -66,17 +66,16 @@
     @endphp
 
     <div class="header">
-        <div>JADWAL PKL UNIVERSITAS BRAWIJAYA MALANG</div>
-        <div>BIDANG LAYANAN DAN PENGEMBANGAN PERPUSTAKAAN</div>
+        <div style="text-transform: uppercase;">JADWAL PKL {{ $group->name }} MALANG </div>
+        <div>{{ $divisionName }}</div>
         <div style="text-transform: none; margin-top: 5px;">
             Tanggal {{ $startDate->translatedFormat('j F Y') }} - {{ $endDate->translatedFormat('j F Y') }}
         </div>
-        <div style="text-transform: none;">({{ $group->name }})</div>
     </div>
 
     <table>
         <thead>
-            <tr>
+            <tr>    
                 <th style="width: 50px;">NO</th>
                 <th style="width: 25%;">NAMA</th>
                 <th style="width: 25%;">TANGGAL</th>
@@ -110,12 +109,6 @@
         </tbody>
     </table>
 
-    <div class="footer">
-        <div>Malang, {{ now()->translatedFormat('j F Y') }}</div>
-        <div>Kepala Bidang Layanan dan Pengembangan Perpustakaan</div>
-        <br><br><br><br>
-        <div style="font-weight: bold; text-decoration: underline; text-transform: uppercase;">LINDA DESRIWATI, SKM</div>
-        <div>NIP. 19691212 199303 2 008</div>
-    </div>
+
 </body>
 </html>
