@@ -77,7 +77,7 @@
                                     class="hover:text-blue-600 transition {{ request()->routeIs('admin.logbooks.*') ? 'text-blue-600' : '' }}">Logbook</a>
                             </li>
                             <li><a href="{{ route('admin.reports.index') }}"
-                                    class="hover:text-blue-600 transition {{ request()->routeIs('admin.reports.*') ? 'text-blue-600' : '' }}">Laporan</a>
+                                    class="hover:text-blue-600 transition {{ request()->routeIs('admin.reports.*') ? 'text-blue-600' : '' }}">Statistik</a>
                             </li>
                             <li><a href="{{ route('admin.users.index') }}"
                                     class="hover:text-blue-600 transition {{ request()->routeIs('admin.users.index') ? 'text-blue-600' : '' }}">User Role</a>
@@ -160,7 +160,7 @@
                             <a href="{{ route('admin.logbooks.index') }}"
                                 class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">Logbook</a>
                             <a href="{{ route('admin.reports.index') }}"
-                                class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">Laporan</a>
+                                class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">Statistik</a>
                             <a href="{{ route('admin.users.index') }}"
                                 class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md">User Role</a>
                         @else

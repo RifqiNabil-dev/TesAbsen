@@ -10,7 +10,7 @@
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <h2 class="text-xl font-semibold text-gray-800 flex items-center gap-2">
             <i class="bi bi-file-text"></i>
-            Laporan & Penilaian
+            Statistik Peserta
         </h2>
     </div>
 
@@ -26,17 +26,6 @@
                        placeholder="Cari nama, email, atau NIM..."
                        class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300
                               focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm">
-            </div>
-
-            <!-- Filter Penilaian -->
-            <div class="w-full md:w-56">
-                <select x-model="status"
-                        class="w-full rounded-lg border border-gray-300 py-2 px-3 text-sm
-                               focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                    <option value="">Semua Penilaian</option>
-                    <option value="belum">Belum Dinilai</option>
-                    <option value="sudah">Sudah Dinilai</option>
-                </select>
             </div>
 
         </div>
@@ -56,7 +45,6 @@
                             <th class="px-4 py-3 border-b text-center">NIM</th>
                             <th class="px-4 py-3 border-b text-center">Total Presensi</th>
                             <th class="px-4 py-3 border-b text-center">Total Logbook</th>
-                            <th class="px-4 py-3 border-b text-center">Penilaian Terakhir</th>
                             <th class="px-4 py-3 border-b text-center">Aksi</th>
                         </tr>
                     </thead>
@@ -94,36 +82,12 @@
                                 </td>
 
                                 <td class="px-4 py-3 text-center">
-                                    @if($mhs->assessments->count() > 0)
-                                        <span class="font-semibold text-gray-800">
-                                            {{ $mhs->assessments->last()->grade }}
-                                        </span>
-                                        <span class="text-xs text-gray-500">
-                                            ({{ $mhs->assessments->last()->total_score }})
-                                        </span>
-                                    @else
-                                        <span class="text-sm text-gray-400 italic">
-                                            Belum dinilai
-                                        </span>
-                                    @endif
-                                </td>
-
-                                <td class="px-4 py-3 text-center">
-                                    @if($mhs->assessments->count() > 0)
-                                        <a href="{{ route('admin.reports.edit', $mhs->id) }}"
-                                           class="inline-flex items-center gap-1.5 rounded-lg bg-yellow-500 px-3 py-1.5
-                                                  text-xs font-medium text-white shadow-sm hover:bg-yellow-600 transition">
-                                            <i class="bi bi-pencil-square"></i>
-                                            Edit
-                                        </a>
-                                    @else
                                         <a href="{{ route('admin.reports.show', $mhs->id) }}"
                                            class="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5
                                                   text-xs font-medium text-white shadow-sm hover:bg-blue-700 transition">
                                             <i class="bi bi-eye"></i>
-                                            Nilai
+                                            Detail
                                         </a>
-                                    @endif
                                 </td>
                             </tr>
                         @empty
